@@ -1,0 +1,7 @@
+C:\development\Rekurencjon\Rekurencjon\bin\Debug\Rekurencjon.exe.config
+C:\development\Rekurencjon\Rekurencjon\bin\Debug\Rekurencjon.exe
+C:\development\Rekurencjon\Rekurencjon\bin\Debug\Rekurencjon.pdb
+C:\development\Rekurencjon\Rekurencjon\obj\Debug\Rekurencjon.csprojResolveAssemblyReference.cache
+C:\development\Rekurencjon\Rekurencjon\obj\Debug\Rekurencjon.csproj.CoreCompileInputs.cache
+C:\development\Rekurencjon\Rekurencjon\obj\Debug\Rekurencjon.exe
+C:\development\Rekurencjon\Rekurencjon\obj\Debug\Rekurencjon.pdb
