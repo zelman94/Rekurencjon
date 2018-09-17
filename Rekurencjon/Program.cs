@@ -10,21 +10,7 @@ namespace Rekurencjon
 {
     class Program
     {
-        static public List<string> listPathTobuilds = new List<string> {
 
-
-            @"\\10.128.3.1\DFS_Data_SSC_FS_GenieBuilds\Phoenix\Genie", // po kolei jak w cmb FS
-            @"\\10.128.3.1\DFS_Data_SSC_FS_GenieBuilds\Phoenix\Oasis",
-            @"\\10.128.3.1\DFS_Data_SSC_FS_GenieBuilds\Phoenix\ExpressFit",
-            @"", // medical
-            @"", //cumulus
-            @"\\10.128.3.1\DFS_Data_KBN_RnD_FS_Programs\Fitting Applications\Genie\20",
-            @"\\10.128.3.1\DFS_Data_KBN_RnD_FS_Programs\Fitting Applications\Oasis\20",
-            @"\\10.128.3.1\DFS_Data_KBN_RnD_FS_Programs\Fitting Applications\ExpressFit\20",
-            @"\\10.128.3.1\DFS_Data_KBN_RnD_FS_Programs\Fitting Applications\GenieMedical\20",
-            @"\\10.128.3.1\DFS_Data_KBN_RnD_FS_Programs\Fitting Applications\Cumulus\20"
-
-        };
 
         public List<string> listExeFiles = new List<string> {
 
@@ -57,176 +43,111 @@ namespace Rekurencjon
             @"4Cumulus_PRE_path.txt"
 
         };
+
+        public List<string> listFilesName_Compositions = new List<string> {
+
+            @"0Oticon_dir_Compositions.txt", // 0FS_dir.txt
+            @"0Oticon_path_Compositions.txt", // 0FS_path.txt
+            @"1Bernafon_dir_Compositions.txt", // 0FS_dir.txt
+            @"1Bernafon_path_Compositions.txt",
+            @"2Sonic_dir_Compositions.txt", // 0FS_dir.txt
+            @"2Sonic_path_Compositions.txt",
+            @"3GenieMedical_dir_Compositions.txt", // 0FS_dir.txt
+            @"3GenieMedical_path_Compositions.txt",
+            @"4Cumulus_dir_Compositions.txt", // 0FS_dir.txt
+            @"4Cumulus_path_Compositions.txt",
+
+        };
+
+
         private List<pathAndDir> Paths_Dirs = new List<pathAndDir>();
 
-        public void Savebuildsinfo()
+
+        public List<string> ListOfNightliPathsComposition = new List<string>(); // kompozycje
+        public List<string> ListOfNightliPathsMedium = new List<string>(); //medium installers
+
+        public bool IsDirectoryEmpty(string path) // czy jest pusty folder
         {
-            List<pathAndDir> tmpList = Paths_Dirs;
+            return !Directory.EnumerateFileSystemEntries(path).Any();
+        }
 
+        private List<pathAndDir> GetListOfNightliPaths(string RootPath, string release) // pobieram liste paths do exe
+        {
+            List<string> ListOfNightliPaths_Master = new List<string>();
+            List<string> ListOfNightliPaths = new List<string>();
+            List<pathAndDir> listallpathsanddir = new List<pathAndDir>();
 
-            int j = 1;
-            int k = 0;
-            for (int i = 0; i < tmpList.Count; i++)
+            var directories = Directory.GetDirectories(RootPath + release);
+
+            foreach (var item in directories)
             {
-                try
+                if (item.Contains("master"))
                 {
-                    //File.Delete(@"C:\Program Files\DGS - PAZE & MIBW\Data\" + listFilesName[k]);
-                    //File.Delete(@"C:\Program Files\DGS - PAZE & MIBW\Data\" + listFilesName[j]);
-
-                    //File.Create(@"C:\Program Files\DGS - PAZE & MIBW\Data\" + listFilesName[k]);
-                    //File.Create(@"C:\Program Files\DGS - PAZE & MIBW\Data\" + listFilesName[j]);
-
-
-
-                    using (StreamWriter outputFile = new StreamWriter(@"C:\Program Files\DGS - PAZE & MIBW\Data\" + listFilesName[k]))
-                    {
-                        foreach (string line in tmpList[i].dir)
-                            outputFile.WriteLine(line);
-
-                        outputFile.Close();
-                    }
-
-                    using (StreamWriter outputFile = new StreamWriter(@"C:\Program Files\DGS - PAZE & MIBW\Data\" + listFilesName[j]))
-                    {
-                        foreach (string line in tmpList[i].path)
-                            outputFile.WriteLine(line);
-
-                        outputFile.Close();
-                    }
-
-
-                    //System.IO.File.WriteAllLines(@"C:\Program Files\DGS - PAZE & MIBW\Data\" + listFilesName[k], tmpList[i].dir);
-                    //System.IO.File.WriteAllLines(@"C:\Program Files\DGS - PAZE & MIBW\Data\" + listFilesName[j], tmpList[i].path);
-
-
-
-                    j += 2; ;
-                    k += 2; ;
+                    ListOfNightliPaths_Master.Add(item);
                 }
-                catch (Exception x)
+            }
+            pathAndDir tmp = new pathAndDir();
+
+            foreach (var item in ListOfNightliPaths_Master)
+            {
+                if (/*!IsDirectoryEmpty(item) && */Directory.Exists(item + "\\DevResults-" + release)) // lezeli jest kompozycja to dodaje do listy 
                 {
-                  //  MessageBox.Show("cannot write to file");
+                    tmp.path.Add(item);
+                    tmp.dir.Add(new DirectoryInfo(item).Name + " " + Directory.GetCreationTime(item));
                 }
             }
 
+            tmp.path.Reverse();
+            tmp.dir.Reverse();
+
+
+            var tmp2 = tmp.path.Take(50);
+            var tmp3 = tmp.dir.Take(50);
+
+            pathAndDir tmpinstance = new pathAndDir();
+
+            tmpinstance.path = tmp2.ToList();
+            tmpinstance.dir = tmp3.ToList();
+
+            listallpathsanddir.Add(tmpinstance);
+
+            return listallpathsanddir;
         }
 
 
-        private pathAndDir GetBindDirNames(string path, List<string> exenames, pathAndDir tmp, int nr)
+
+        public void Savebuildsinfo(string pathFile, string dirFile, pathAndDir dirsAndPaths) // pathFile - name file to save DIRS // dirFile - name file to save Paths, // disAndPaths - object contain list path and dirs to save
         {
 
-            List<string> dir = null;
-            bool flag = false;
-            int dl;
             try
             {
-                dir = System.IO.Directory.GetDirectories(path).ToList<string>();
 
-                var tmp2 = dir.Skip(Math.Max(0, dir.Count() - 20));
-
-                //var firstItems = dir.OrderBy(q => q).Take(20);
-                dir = tmp2.ToList<string>();
-            }
-            catch (Exception)
-            {
-
-            }
-
-
-
-            if (nr == 0 && dir != null)
-            {
-                foreach (var item in dir)
+                using (StreamWriter outputFile = new StreamWriter(@"C:\Program Files\UltimateChanger\Data\" + dirFile))
                 {
-                    tmp.dir.Add(new DirectoryInfo(item).Name);
-                }
-            }
+                    foreach (string line in dirsAndPaths.dir)
+                        outputFile.WriteLine(line);
 
-            if (dir != null)
-            {
-                foreach (var item in dir)
-                {
-                    GetBindDirNames($"{item}", exenames, tmp, ++nr);
-                    List<string> pliczki = System.IO.Directory.GetFiles(item).ToList<string>();
-
-                    foreach (var item2 in exenames)
-                    {
-                        foreach (var item3 in pliczki)
-                        {
-                            dl = item3.Length - 1;
-
-                            string tmp_item3 = item3.Substring(dl - item2.Length);
-                            if (tmp_item3 == ("\\" + item2))
-                            {
-                                tmp.path.Add(item3);
-                                flag = true;
-                                break;
-                            }
-                        }
-                        if (flag)
-                        {
-                            flag = false;
-                            break;
-                        }
-                    }
+                    outputFile.Close();
                 }
 
-            }
-
-            return tmp;
-
-        }
-
-        public List<pathAndDir> getAllDirPath(string release) // pobieram wszystkie sciezki i dir z path i podmieniam w glownym pliku 
-        {
-            List<pathAndDir> lista2 = new List<pathAndDir>();
-
-
-            foreach (var item in listPathTobuilds)
-            {
-                pathAndDir tmp = new pathAndDir();
-                //licznik_przejsc++;
-                if (item.Contains("FS_Programs"))
+                using (StreamWriter outputFile = new StreamWriter(@"C:\Program Files\UltimateChanger\Data\" + pathFile))
                 {
+                    foreach (string line in dirsAndPaths.path)
+                        outputFile.WriteLine(line);
 
-                    lista2.Add(GetBindDirNames(item + release + @"\Pre-releases", listExeFiles, tmp, 0));
+                    outputFile.Close();
                 }
-                else
-                    lista2.Add(GetBindDirNames(item, listExeFiles, tmp, 0));
 
-
-                //((MainWindow)System.Windows.Application.Current.MainWindow).progress.Value = ((MainWindow)System.Windows.Application.Current.MainWindow).progress.Value + (100 / listPathTobuilds.Count);
-            }
-
-            return lista2;
-
-        }
-
-        public void makeProgress(string release)
-        {
-            List<pathAndDir> tmplistapathdir = new List<pathAndDir>();
-            Console.WriteLine("watek sobie dziala :)");
-            bool warunek = true;
-
-            //List<pathAndDir> tmp = new List<pathAndDir>();
-            try
-            {
-                tmplistapathdir = getAllDirPath(release);      // pobierac z argumentu wywolawczeggo program                     
             }
             catch (Exception x)
             {
-               // MessageBox.Show(x.ToString());
+                //  MessageBox.Show("cannot write to file");
             }
 
 
-            Paths_Dirs = tmplistapathdir;
-
-
-            Savebuildsinfo();
-
-
-
         }
+
+
         [DllImport("kernel32.dll")]
         static extern IntPtr GetConsoleWindow();
 
@@ -238,33 +159,88 @@ namespace Rekurencjon
 
         static void Main(string[] args)
         {
+
+            // args 0 - Full/Medium/Composition/Copy
+            // args 1 release
+            // args 2 pathFile - only file name
+            // args 3 dirFile - only file name "test.txt"
+
+
+            //Copy:
+
+            // args 1 from
+            // args 2 to
+            // args 3 name of file
+
+            //Console.WriteLine((args[0]));
+
+            //Console.WriteLine((args[1]));
+
             var handle = GetConsoleWindow();
 
-            // Hide
+            //// Hide
             ShowWindow(handle, SW_HIDE);
             Program tmp = new Program();
 
             // Get command line arguments
-            try
+
+            switch (args[0])
             {
-                Console.WriteLine(args[0]);
-                tmp.makeProgress(args[0]);
-            }
-            catch (Exception)
-            {
-                ShowWindow(handle, SW_SHOW);
-                Console.WriteLine("Error in Rekurencjon.exe :C");
-                Console.WriteLine("Press ESC to stop");
-                do
-                {
-                    while (!Console.KeyAvailable)
+                case "Composition":
+
+                    List<pathAndDir> tmp2;
+
+
+                    try
                     {
-                        // Do something
+                        tmp2 = tmp.GetListOfNightliPaths(@"\\demant.com\data\KBN\RnD\SWS\Build\Arizona\Phoenix\Nightly-", args[1]);
                     }
-                } while (Console.ReadKey(true).Key != ConsoleKey.Escape);
+                    catch (Exception)
+                    {
+                        tmp2 = tmp.GetListOfNightliPaths(@"\\demant.com\data\KBN\RnD\SWS\Build\Arizona\Phoenix\Nightly-", "19.1");
+                    }
+
+
+
+                    // i * 2 = pierwsza nazwa pliku do zapisu // dir +1 = path  //listFilesName_Compositions
+
+                    tmp.Savebuildsinfo(args[2], args[3], tmp2[0]);
+
+                    Console.WriteLine((args[2]));
+                    Console.WriteLine((args[3]));
+
+                    break;
+
+                case "Copy":
+
+                    // args 1 from
+                    // args 2 to
+
+                    try
+                    {
+                        File.Copy(args[1], args[2]);
+                    }
+                    catch (Exception x)
+                    {
+                        Console.WriteLine(x.ToString());
+
+                    }
+
+
+
+                    break;
+
+                default:
+                    break;
             }
 
-         
+
+
+
+
+
+            // tmp.Savebuildsinfo($"Oticon_path_Composition.txt", $"Oticon_dir_Composition.txt", tmp2[0]);
+            return;
         }
     }
 }
