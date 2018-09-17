@@ -90,7 +90,7 @@ namespace Rekurencjon
 
             foreach (var item in directories)
             {
-                if (item.Contains("master"))
+                if (item.Contains("Nightly-master") /*&& !item.Contains("SkipTest")*/)
                 {
                     ListOfNightliPaths_Master.Add(item);
                 }
