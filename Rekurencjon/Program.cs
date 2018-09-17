@@ -76,8 +76,17 @@ namespace Rekurencjon
             List<string> ListOfNightliPaths_Master = new List<string>();
             List<string> ListOfNightliPaths = new List<string>();
             List<pathAndDir> listallpathsanddir = new List<pathAndDir>();
-
-            var directories = Directory.GetDirectories(RootPath + release);
+            List<string> directories = new List<string>();
+            try
+            {
+               directories = Directory.GetDirectories(RootPath + release).ToList();
+            }
+            catch (Exception x)
+            {
+                Console.WriteLine(x.ToString() + " \nat: " + RootPath + release);
+                Console.ReadKey();
+            }
+           
 
             foreach (var item in directories)
             {
@@ -121,6 +130,18 @@ namespace Rekurencjon
 
             try
             {
+                if (!Directory.Exists(@"C:\Program Files\UltimateChanger\Data\"))
+                {
+                    if (!Directory.Exists(@"C:\Program Files\UltimateChanger\"))
+                    {
+                        Directory.CreateDirectory(@"C:\Program Files\UltimateChanger\");
+                        Directory.CreateDirectory(@"C:\Program Files\UltimateChanger\Data\");
+                    }
+                    else
+                    {
+                        Directory.CreateDirectory(@"C:\Program Files\UltimateChanger\Data\");
+                    }
+                }
 
                 using (StreamWriter outputFile = new StreamWriter(@"C:\Program Files\UltimateChanger\Data\" + dirFile))
                 {
@@ -159,6 +180,12 @@ namespace Rekurencjon
 
         static void Main(string[] args)
         {
+            Console.WriteLine((args[0]));
+            Console.WriteLine((args[1]));
+            Console.WriteLine((args[2]));
+
+
+
 
             // args 0 - Full/Medium/Composition/Copy
             // args 1 release
@@ -179,7 +206,7 @@ namespace Rekurencjon
             var handle = GetConsoleWindow();
 
             //// Hide
-            ShowWindow(handle, SW_HIDE);
+           // ShowWindow(handle, SW_HIDE);
             Program tmp = new Program();
 
             // Get command line arguments
@@ -213,16 +240,23 @@ namespace Rekurencjon
 
                 case "Copy":
 
+                    // args 0 Copy
                     // args 1 from
                     // args 2 to
 
                     try
                     {
+                        if (args.Length == 4 )
+                        {
+                            File.Copy(args[1], args[2]+ " " +args[3]);
+                        }
+                        else
                         File.Copy(args[1], args[2]);
                     }
                     catch (Exception x)
                     {
                         Console.WriteLine(x.ToString());
+                        Console.ReadKey();
 
                     }
 
