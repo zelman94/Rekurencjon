@@ -238,6 +238,9 @@ namespace Rekurencjon
 
                     break;
 
+
+                //path to installer \\demant.com\data\KBN\RnD\SWS\Build\Arizona\Phoenix\FullInstaller-19.1
+
                 case "Copy":
 
                     // args 0 Copy
