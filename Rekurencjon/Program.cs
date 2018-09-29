@@ -206,7 +206,7 @@ namespace Rekurencjon
             var handle = GetConsoleWindow();
 
             //// Hide
-           // ShowWindow(handle, SW_HIDE);
+            ShowWindow(handle, SW_HIDE);
             Program tmp = new Program();
 
             // Get command line arguments
@@ -220,7 +220,10 @@ namespace Rekurencjon
 
                     try
                     {
-                        tmp2 = tmp.GetListOfNightliPaths(@"\\demant.com\data\KBN\RnD\SWS\Build\Arizona\Phoenix\Nightly-", args[1]);
+                        if (Directory.Exists($"\\\\demant.com\\data\\KBN\\RnD\\SWS\\Build\\Arizona\\Phoenix\\Nightly-{args[1]}"))
+                            tmp2 = tmp.GetListOfNightliPaths(@"\\demant.com\data\KBN\RnD\SWS\Build\Arizona\Phoenix\Nightly-", args[1]);
+                        else
+                            return;
                     }
                     catch (Exception)
                     {

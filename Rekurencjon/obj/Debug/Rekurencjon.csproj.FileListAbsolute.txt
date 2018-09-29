@@ -11,4 +11,3 @@ C:\Users\Pawel\Documents\GitHub\Rekurencjon\Rekurencjon\bin\Debug\Rekurencjon.pd
 C:\Users\Pawel\Documents\GitHub\Rekurencjon\Rekurencjon\obj\Debug\Rekurencjon.csproj.CoreCompileInputs.cache
 C:\Users\Pawel\Documents\GitHub\Rekurencjon\Rekurencjon\obj\Debug\Rekurencjon.exe
 C:\Users\Pawel\Documents\GitHub\Rekurencjon\Rekurencjon\obj\Debug\Rekurencjon.pdb
-C:\Users\Pawel\Documents\GitHub\Rekurencjon\Rekurencjon\obj\Debug\Rekurencjon.csprojAssemblyReference.cache
