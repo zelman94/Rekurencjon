@@ -270,7 +270,10 @@ namespace Rekurencjon
 
                     try
                     {
-                        tmp2 = tmp.GetListOfNightliPaths(@"\\demant.com\data\KBN\RnD\SWS\Build\Arizona\Phoenix\Nightly-", args[1]);
+                        if (Directory.Exists($"\\\\demant.com\\data\\KBN\\RnD\\SWS\\Build\\Arizona\\Phoenix\\Nightly-{args[1]}"))
+                            tmp2 = tmp.GetListOfNightliPaths(@"\\demant.com\data\KBN\RnD\SWS\Build\Arizona\Phoenix\Nightly-", args[1]);
+                        else
+                            return;
                     }
                     catch (Exception)
                     {
