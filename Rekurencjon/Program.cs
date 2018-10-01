@@ -125,7 +125,53 @@ namespace Rekurencjon
 
 
 
-        public void Savebuildsinfo(string pathFile, string dirFile, pathAndDir dirsAndPaths) // pathFile - name file to save DIRS // dirFile - name file to save Paths, // disAndPaths - object contain list path and dirs to save
+        private List<pathAndDir> GetListOfFullPaths(string RootPath) // pobieram liste paths do exe
+        {
+            List<pathAndDir> listallpathsanddir = new List<pathAndDir>();
+
+            List<string> ListOfNightliPaths_Master = new List<string>();
+            List<string> ListOfNightliPaths = new List<string>();
+
+            List<string> IPs_paths = new List<string>();
+            List<string> directoriesFull = new List<string>();
+            List<string> directoriesMedium = new List<string>();
+            try
+            {
+                IPs_paths = Directory.GetDirectories(RootPath ).ToList(); // tu zawarte sa paths do IPs
+
+
+                //directories = Directory.GetDirectories(RootPath,"setup.exe",SearchOption.AllDirectories).ToList();
+                directoriesFull = Directory.GetFiles(RootPath, "setup.exe", SearchOption.AllDirectories).ToList();
+                var EXEs = Directory.GetFiles(RootPath, "*.exe" ,SearchOption.AllDirectories).ToList();
+                directoriesMedium = EXEs.FindAll(s => s.Contains("Medium"));
+
+
+
+            }
+            catch (Exception x)
+            {
+                Console.WriteLine(x.ToString() + " \nat: " + RootPath);
+                Console.ReadKey();
+            }
+
+
+            directoriesFull.AddRange(directoriesMedium);
+
+            pathAndDir tmpinstance = new pathAndDir();
+
+            tmpinstance.path = IPs_paths;
+            tmpinstance.dir = directoriesFull;
+
+            listallpathsanddir.Add(tmpinstance);
+
+
+
+            return listallpathsanddir;
+
+        }
+
+
+            public void Savebuildsinfo(string pathFile, string dirFile, pathAndDir dirsAndPaths) // pathFile - name file to save DIRS // dirFile - name file to save Paths, // disAndPaths - object contain list path and dirs to save
         {
 
             try
@@ -180,9 +226,9 @@ namespace Rekurencjon
 
         static void Main(string[] args)
         {
-            Console.WriteLine((args[0]));
-            Console.WriteLine((args[1]));
-            Console.WriteLine((args[2]));
+            //Console.WriteLine((args[0]));
+            //Console.WriteLine((args[1]));
+            //Console.WriteLine((args[2]));
 
 
 
@@ -206,16 +252,20 @@ namespace Rekurencjon
             var handle = GetConsoleWindow();
 
             //// Hide
-           // ShowWindow(handle, SW_HIDE);
+            ShowWindow(handle, SW_HIDE);
             Program tmp = new Program();
 
-            // Get command line arguments
 
+
+
+
+            // Get command line arguments
+            List<pathAndDir> tmp2;
             switch (args[0])
             {
                 case "Composition":
 
-                    List<pathAndDir> tmp2;
+                    
 
 
                     try
@@ -240,6 +290,51 @@ namespace Rekurencjon
 
 
                 //path to installer \\demant.com\data\KBN\RnD\SWS\Build\Arizona\Phoenix\FullInstaller-19.1
+
+
+                case "Full":
+                   
+                    if (!Directory.Exists($"\\\\demant.com\\data\\KBN\\RnD\\FS_Programs\\Fitting Applications\\Genie\\20{args[1]}\\Released")) // jezeli nie ma released
+                    {
+                        tmp2 = tmp.GetListOfFullPaths($"\\\\demant.com\\data\\KBN\\RnD\\FS_Programs\\Fitting Applications\\Genie\\20{args[1]}\\Pre-releases");
+                        tmp.Savebuildsinfo("Genie_dir.txt", "Genie_path.txt",  tmp2[0]);// zapis do pliku
+
+                        tmp2 = tmp.GetListOfFullPaths($"\\\\demant.com\\data\\KBN\\RnD\\FS_Programs\\Fitting Applications\\GenieMedical\\20{args[1]}\\Pre-releases");
+                        tmp.Savebuildsinfo("GenieMedical_dir.txt", "GenieMedical_path.txt",  tmp2[0]);// zapis do pliku
+
+                        tmp2 = tmp.GetListOfFullPaths($"\\\\demant.com\\data\\KBN\\RnD\\FS_Programs\\Fitting Applications\\Oasis\\20{args[1]}\\Pre-releases");
+                        tmp.Savebuildsinfo("Oasis_dir.txt", "Oasis_path.txt",  tmp2[0]);// zapis do plikuv
+
+                        tmp2 = tmp.GetListOfFullPaths($"\\\\demant.com\\data\\KBN\\RnD\\FS_Programs\\Fitting Applications\\Philips\\20{args[1]}\\Pre-releases");
+                        tmp.Savebuildsinfo("Philips_dir.txt", "Philips_path.txt",  tmp2[0]);// zapis do pliku
+
+                        tmp2 = tmp.GetListOfFullPaths($"\\\\demant.com\\data\\KBN\\RnD\\FS_Programs\\Fitting Applications\\ExpressFit\\20{args[1]}\\Pre-releases");
+                        tmp.Savebuildsinfo("ExpressFit_dir.txt", "ExpressFit_path.txt",  tmp2[0]);// zapis do pliku
+                    }
+                    else
+                    {
+                        tmp2 = tmp.GetListOfFullPaths($"\\\\demant.com\\data\\KBN\\RnD\\FS_Programs\\Fitting Applications\\Genie\\20{args[1]}\\Released");
+                        tmp.Savebuildsinfo("Genie_dir.txt", "Genie_path.txt",  tmp2[0]);// zapis do pliku
+
+                        tmp2 = tmp.GetListOfFullPaths($"\\\\demant.com\\data\\KBN\\RnD\\FS_Programs\\Fitting Applications\\GenieMedical\\20{args[1]}\\Released");
+                        tmp.Savebuildsinfo("GenieMedical_dir.txt", "GenieMedical_path.txt",  tmp2[0]);// zapis do pliku
+
+                        tmp2 = tmp.GetListOfFullPaths($"\\\\demant.com\\data\\KBN\\RnD\\FS_Programs\\Fitting Applications\\Oasis\\20{args[1]}\\Released");
+                        tmp.Savebuildsinfo("Oasis_dir.txt", "Oasis_path.txt",  tmp2[0]);// zapis do plikuv
+
+                        tmp2 = tmp.GetListOfFullPaths($"\\\\demant.com\\data\\KBN\\RnD\\FS_Programs\\Fitting Applications\\Philips\\20{args[1]}\\Released");
+                        tmp.Savebuildsinfo("Philips_dir.txt", "Philips_path.txt",  tmp2[0]);// zapis do pliku
+
+                        tmp2 = tmp.GetListOfFullPaths($"\\\\demant.com\\data\\KBN\\RnD\\FS_Programs\\Fitting Applications\\ExpressFit\\20{args[1]}\\Released");
+                        tmp.Savebuildsinfo("ExpressFit_dir.txt", "ExpressFit_path.txt",  tmp2[0]);// zapis do pliku
+                    }
+
+
+                   
+
+
+                    break;
+
 
                 case "Copy":
 
