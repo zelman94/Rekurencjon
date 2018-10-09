@@ -11,58 +11,7 @@ namespace Rekurencjon
     class Program
     {
 
-
-        public List<string> listExeFiles = new List<string> {
-
-            @"Setup.exe",
-            @"EXPRESSfitMini.exe"// po kolei         
-           // "Genie.exe"
-        };
-
-        public List<string> listFilesName = new List<string> {
-
-            @"0Oticon_dir.txt", // 0FS_dir.txt
-            @"0Oticon_path.txt", // 0FS_path.txt
-            @"1Bernafon_dir.txt", // 0FS_dir.txt
-            @"1Bernafon_path.txt",
-            @"2Sonic_dir.txt", // 0FS_dir.txt
-            @"2Sonic_path.txt",
-            @"3GenieMedical_dir.txt", // 0FS_dir.txt
-            @"3GenieMedical_path.txt",
-            @"4Cumulus_dir.txt", // 0FS_dir.txt
-            @"4Cumulus_path.txt",
-            @"0Oticon_PRE_dir.txt", // 0FS_dir.txt
-            @"0Oticon_PRE_path.txt", // 0FS_path.txt
-            @"1Bernafon_PRE_dir.txt", // 0FS_dir.txt
-            @"1Bernafon_PRE_path.txt",
-            @"2Sonic_PRE_dir.txt", // 0FS_dir.txt
-            @"2Sonic_PRE_path.txt",
-            @"3GenieMedical_PRE_dir.txt", // 0FS_dir.txt
-            @"3GenieMedical_PRE_path.txt",
-            @"4Cumulus_PRE_dir.txt", // 0FS_dir.txt
-            @"4Cumulus_PRE_path.txt"
-
-        };
-
-        public List<string> listFilesName_Compositions = new List<string> {
-
-            @"0Oticon_dir_Compositions.txt", // 0FS_dir.txt
-            @"0Oticon_path_Compositions.txt", // 0FS_path.txt
-            @"1Bernafon_dir_Compositions.txt", // 0FS_dir.txt
-            @"1Bernafon_path_Compositions.txt",
-            @"2Sonic_dir_Compositions.txt", // 0FS_dir.txt
-            @"2Sonic_path_Compositions.txt",
-            @"3GenieMedical_dir_Compositions.txt", // 0FS_dir.txt
-            @"3GenieMedical_path_Compositions.txt",
-            @"4Cumulus_dir_Compositions.txt", // 0FS_dir.txt
-            @"4Cumulus_path_Compositions.txt",
-
-        };
-
-
         private List<pathAndDir> Paths_Dirs = new List<pathAndDir>();
-
-
         public List<string> ListOfNightliPathsComposition = new List<string>(); // kompozycje
         public List<string> ListOfNightliPathsMedium = new List<string>(); //medium installers
 
@@ -229,9 +178,6 @@ namespace Rekurencjon
             //Console.WriteLine((args[0]));
             //Console.WriteLine((args[1]));
             //Console.WriteLine((args[2]));
-
-
-
 
             // args 0 - Full/Medium/Composition/Copy
             // args 1 release
