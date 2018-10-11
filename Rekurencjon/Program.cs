@@ -20,7 +20,7 @@ namespace Rekurencjon
             return !Directory.EnumerateFileSystemEntries(path).Any();
         }
 
-        private List<pathAndDir> GetListOfNightliPaths(string RootPath, string release) // pobieram liste paths do exe
+        private List<pathAndDir> GetListOfNightliPaths(string RootPath, string release, string find) // pobieram liste paths do exe // find - MASTER albo RC
         {
             List<string> ListOfNightliPaths_Master = new List<string>();
             List<string> ListOfNightliPaths = new List<string>();
@@ -35,11 +35,19 @@ namespace Rekurencjon
                 Console.WriteLine(x.ToString() + " \nat: " + RootPath + release);
                 Console.ReadKey();
             }
-           
+            string FindStirng = ""; 
+            if (find == "RC")
+            {
+                FindStirng = "-rc-";
+            }
+            else
+            {
+                FindStirng = "Nightly-master";
+            }
 
             foreach (var item in directories)
             {
-                if (item.Contains("Nightly-master") /*&& !item.Contains("SkipTest")*/)
+                if (item.Contains(FindStirng) /*&& !item.Contains("SkipTest")*/)
                 {
                     ListOfNightliPaths_Master.Add(item);
                 }
@@ -217,13 +225,13 @@ namespace Rekurencjon
                     try
                     {
                         if (Directory.Exists($"\\\\demant.com\\data\\KBN\\RnD\\SWS\\Build\\Arizona\\Phoenix\\Nightly-{args[1]}"))
-                            tmp2 = tmp.GetListOfNightliPaths(@"\\demant.com\data\KBN\RnD\SWS\Build\Arizona\Phoenix\Nightly-", args[1]);
+                            tmp2 = tmp.GetListOfNightliPaths(@"\\demant.com\data\KBN\RnD\SWS\Build\Arizona\Phoenix\Nightly-", args[1], args[2]);
                         else
                             return;
                     }
                     catch (Exception)
                     {
-                        tmp2 = tmp.GetListOfNightliPaths(@"\\demant.com\data\KBN\RnD\SWS\Build\Arizona\Phoenix\Nightly-", "19.1");
+                        tmp2 = tmp.GetListOfNightliPaths(@"\\demant.com\data\KBN\RnD\SWS\Build\Arizona\Phoenix\Nightly-", "19.1", "");
                     }
 
 
