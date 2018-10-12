@@ -191,6 +191,7 @@ namespace Rekurencjon
             // args 1 release
             // args 2 pathFile - only file name
             // args 3 dirFile - only file name "test.txt"
+            // arg 4 - RC/MASTER
 
 
             //Copy:
@@ -225,7 +226,7 @@ namespace Rekurencjon
                     try
                     {
                         if (Directory.Exists($"\\\\demant.com\\data\\KBN\\RnD\\SWS\\Build\\Arizona\\Phoenix\\Nightly-{args[1]}"))
-                            tmp2 = tmp.GetListOfNightliPaths(@"\\demant.com\data\KBN\RnD\SWS\Build\Arizona\Phoenix\Nightly-", args[1], args[2]);
+                            tmp2 = tmp.GetListOfNightliPaths(@"\\demant.com\data\KBN\RnD\SWS\Build\Arizona\Phoenix\Nightly-", args[1], args[4]);
                         else
                             return;
                     }
