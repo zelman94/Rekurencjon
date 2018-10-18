@@ -94,13 +94,21 @@ namespace Rekurencjon
             List<string> directoriesMedium = new List<string>();
             try
             {
-                IPs_paths = Directory.GetDirectories(RootPath ).ToList(); // tu zawarte sa paths do IPs
+                if (Directory.Exists(RootPath))
+                {
+                    IPs_paths = Directory.GetDirectories(RootPath).ToList(); // tu zawarte sa paths do IPs
 
 
-                //directories = Directory.GetDirectories(RootPath,"setup.exe",SearchOption.AllDirectories).ToList();
-                directoriesFull = Directory.GetFiles(RootPath, "setup.exe", SearchOption.AllDirectories).ToList();
-                var EXEs = Directory.GetFiles(RootPath, "*.exe" ,SearchOption.AllDirectories).ToList();
-                directoriesMedium = EXEs.FindAll(s => s.Contains("Medium"));
+                    //directories = Directory.GetDirectories(RootPath,"setup.exe",SearchOption.AllDirectories).ToList();
+                    directoriesFull = Directory.GetFiles(RootPath, "setup.exe", SearchOption.AllDirectories).ToList();
+                    var EXEs = Directory.GetFiles(RootPath, "*.exe", SearchOption.AllDirectories).ToList();
+                    directoriesMedium = EXEs.FindAll(s => s.Contains("Medium"));
+                }
+                else
+                {
+                    return null;
+                }
+                
 
 
 
@@ -145,22 +153,43 @@ namespace Rekurencjon
                         Directory.CreateDirectory(@"C:\Program Files\UltimateChanger\Data\");
                     }
                 }
-
-                using (StreamWriter outputFile = new StreamWriter(@"C:\Program Files\UltimateChanger\Data\" + dirFile))
+                if (dirsAndPaths != null)
                 {
-                    foreach (string line in dirsAndPaths.dir)
-                        outputFile.WriteLine(line);
+                    using (StreamWriter outputFile = new StreamWriter(@"C:\Program Files\UltimateChanger\Data\" + dirFile))
+                    {
+                        foreach (string line in dirsAndPaths.dir)
+                            outputFile.WriteLine(line);
 
-                    outputFile.Close();
+                        outputFile.Close();
+                    }
+
+                    using (StreamWriter outputFile = new StreamWriter(@"C:\Program Files\UltimateChanger\Data\" + pathFile))
+                    {
+
+                        foreach (string line in dirsAndPaths.path)
+                            outputFile.WriteLine(line);
+
+                        outputFile.Close();
+                    }
                 }
-
-                using (StreamWriter outputFile = new StreamWriter(@"C:\Program Files\UltimateChanger\Data\" + pathFile))
+                else
                 {
-                    foreach (string line in dirsAndPaths.path)
-                        outputFile.WriteLine(line);
+                    using (StreamWriter outputFile = new StreamWriter(@"C:\Program Files\UltimateChanger\Data\" + dirFile))
+                    {
+                        
+                            outputFile.WriteLine("");
 
-                    outputFile.Close();
+                        outputFile.Close();
+                    }
+
+                    using (StreamWriter outputFile = new StreamWriter(@"C:\Program Files\UltimateChanger\Data\" + pathFile))
+                    {
+                        outputFile.WriteLine("");
+
+                        outputFile.Close();
+                    }
                 }
+               
 
             }
             catch (Exception x)
@@ -211,12 +240,13 @@ namespace Rekurencjon
             Program tmp = new Program();
 
 
-
+            string arg = "Composition";
 
 
             // Get command line arguments
             List<pathAndDir> tmp2;
             switch (args[0])
+            //switch (arg)
             {
                 case "Composition":
 
@@ -225,8 +255,15 @@ namespace Rekurencjon
 
                     try
                     {
-                        if (Directory.Exists($"\\\\demant.com\\data\\KBN\\RnD\\SWS\\Build\\Arizona\\Phoenix\\Nightly-{args[1]}"))
+                        //if (Directory.Exists($"\\\\demant.com\\data\\KBN\\RnD\\SWS\\Build\\Arizona\\Phoenix\\Nightly-19.1"))
+                            if (Directory.Exists($"\\\\demant.com\\data\\KBN\\RnD\\SWS\\Build\\Arizona\\Phoenix\\Nightly-{args[1]}"))
+                        {
+                            //tmp2 = tmp.GetListOfNightliPaths(@"\\demant.com\data\KBN\RnD\SWS\Build\Arizona\Phoenix\Nightly-", "19.1", "RC");
+
                             tmp2 = tmp.GetListOfNightliPaths(@"\\demant.com\data\KBN\RnD\SWS\Build\Arizona\Phoenix\Nightly-", args[1], args[4]);
+
+                        }
+
                         else
                             return;
                     }
@@ -239,7 +276,16 @@ namespace Rekurencjon
 
                     // i * 2 = pierwsza nazwa pliku do zapisu // dir +1 = path  //listFilesName_Compositions
 
+
+                    // args 0 - Full/Medium/Composition/Copy
+                    // args 1 release
+                    // args 2 pathFile - only file name
+                    // args 3 dirFile - only file name "test.txt"
+                    // arg 4 - RC/MASTER
+
                     tmp.Savebuildsinfo(args[2], args[3], tmp2[0]);
+                    //tmp.Savebuildsinfo("path_compo_test.txt", "dir_compo_test.txt", tmp2[0]);
+
 
                     Console.WriteLine((args[2]));
                     Console.WriteLine((args[3]));
@@ -255,19 +301,62 @@ namespace Rekurencjon
                     if (!Directory.Exists($"\\\\demant.com\\data\\KBN\\RnD\\FS_Programs\\Fitting Applications\\Genie\\20{args[1]}\\Released")) // jezeli nie ma released
                     {
                         tmp2 = tmp.GetListOfFullPaths($"\\\\demant.com\\data\\KBN\\RnD\\FS_Programs\\Fitting Applications\\Genie\\20{args[1]}\\Pre-releases");
-                        tmp.Savebuildsinfo("Genie_dir.txt", "Genie_path.txt",  tmp2[0]);// zapis do pliku
+                        try
+                        {
+                            tmp.Savebuildsinfo("Genie_dir.txt", "Genie_path.txt", tmp2[0]);// zapis do pliku
+
+                        }
+                        catch (Exception x)
+                        {
+                            Console.WriteLine(x.ToString());
+                        }
+
+
 
                         tmp2 = tmp.GetListOfFullPaths($"\\\\demant.com\\data\\KBN\\RnD\\FS_Programs\\Fitting Applications\\GenieMedical\\20{args[1]}\\Pre-releases");
-                        tmp.Savebuildsinfo("GenieMedical_dir.txt", "GenieMedical_path.txt",  tmp2[0]);// zapis do pliku
+                        try
+                        {
+                            tmp.Savebuildsinfo("GenieMedical_dir.txt", "GenieMedical_path.txt", tmp2[0]);// zapis do pliku
+                        }
+                        catch (Exception x)
+                        {
+                            Console.WriteLine(x.ToString());
+                        }
+
 
                         tmp2 = tmp.GetListOfFullPaths($"\\\\demant.com\\data\\KBN\\RnD\\FS_Programs\\Fitting Applications\\Oasis\\20{args[1]}\\Pre-releases");
-                        tmp.Savebuildsinfo("Oasis_dir.txt", "Oasis_path.txt",  tmp2[0]);// zapis do plikuv
+                        try
+                        {
+                            tmp.Savebuildsinfo("Oasis_dir.txt", "Oasis_path.txt", tmp2[0]);// zapis do plikuv
+                        }
+                        catch (Exception x)
+                        {
+                            Console.WriteLine(x.ToString());
+                        }
+
 
                         tmp2 = tmp.GetListOfFullPaths($"\\\\demant.com\\data\\KBN\\RnD\\FS_Programs\\Fitting Applications\\Philips\\20{args[1]}\\Pre-releases");
-                        tmp.Savebuildsinfo("Philips_dir.txt", "Philips_path.txt",  tmp2[0]);// zapis do pliku
+                        try
+                        {
+                            tmp.Savebuildsinfo("Philips_dir.txt", "Philips_path.txt", tmp2[0]);// zapis do pliku
+
+                        }
+                        catch (Exception x)
+                        {
+                            Console.WriteLine(x.ToString());
+                        }
+                       
 
                         tmp2 = tmp.GetListOfFullPaths($"\\\\demant.com\\data\\KBN\\RnD\\FS_Programs\\Fitting Applications\\ExpressFit\\20{args[1]}\\Pre-releases");
-                        tmp.Savebuildsinfo("ExpressFit_dir.txt", "ExpressFit_path.txt",  tmp2[0]);// zapis do pliku
+                        try
+                        {
+                            tmp.Savebuildsinfo("ExpressFit_dir.txt", "ExpressFit_path.txt", tmp2[0]);// zapis do pliku
+                        }
+                        catch (Exception x)
+                        {
+                            Console.WriteLine(x.ToString());
+                        }
+                        
                     }
                     else
                     {
