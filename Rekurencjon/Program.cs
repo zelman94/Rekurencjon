@@ -8,8 +8,10 @@ using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 namespace Rekurencjon
 {
+
     class Program
     {
+
 
         private List<pathAndDir> Paths_Dirs = new List<pathAndDir>();
         public List<string> ListOfNightliPathsComposition = new List<string>(); // kompozycje
@@ -212,39 +214,43 @@ namespace Rekurencjon
 
         static void Main(string[] args)
         {
-            //Console.WriteLine((args[0]));
-            //Console.WriteLine((args[1]));
-            //Console.WriteLine((args[2]));
+                     Log logging = new Log("Rekurencjon");
+        //Console.WriteLine((args[0]));
+        //Console.WriteLine((args[1]));
+        //Console.WriteLine((args[2]));
 
-            // args 0 - Full/Medium/Composition/Copy
-            // args 1 release
-            // args 2 pathFile - only file name
-            // args 3 dirFile - only file name "test.txt"
-            // arg 4 - RC/MASTER
+        // args 0 - Full/Medium/Composition/Copy
+        // args 1 release
+        // args 2 pathFile - only file name
+        // args 3 dirFile - only file name "test.txt"
+        // arg 4 - RC/MASTER
 
 
-            //Copy:
+        //Copy:
 
-            // args 1 from
-            // args 2 to
-            // args 3 name of file
+        // args 1 from
+        // args 2 to
+        // args 3 name of file
 
-            //Console.WriteLine((args[0]));
+        //Console.WriteLine((args[0]));
 
-            //Console.WriteLine((args[1]));
+        //Console.WriteLine((args[1]));
 
-            var handle = GetConsoleWindow();
+        var handle = GetConsoleWindow();
 
             //// Hide
             ShowWindow(handle, SW_HIDE);
             Program tmp = new Program();
 
 
-            string arg = "Composition";
+            string arg = "Copy";
 
 
             // Get command line arguments
             List<pathAndDir> tmp2;
+
+            logging.AddLog("Start as : " + args[0]);
+
             switch (args[0])
             //switch (arg)
             {
@@ -308,6 +314,7 @@ namespace Rekurencjon
                         }
                         catch (Exception x)
                         {
+                            logging.AddLog("Full : " + x.ToString());
                             Console.WriteLine(x.ToString());
                         }
 
@@ -320,6 +327,7 @@ namespace Rekurencjon
                         }
                         catch (Exception x)
                         {
+                            logging.AddLog("Full : " + x.ToString());
                             Console.WriteLine(x.ToString());
                         }
 
@@ -331,11 +339,12 @@ namespace Rekurencjon
                         }
                         catch (Exception x)
                         {
+                            logging.AddLog("Full : " + x.ToString());
                             Console.WriteLine(x.ToString());
                         }
 
 
-                        tmp2 = tmp.GetListOfFullPaths($"\\\\demant.com\\data\\KBN\\RnD\\FS_Programs\\Fitting Applications\\Philips\\20{args[1]}\\Pre-releases");
+                        tmp2 = tmp.GetListOfFullPaths($"\\\\demant.com\\data\\KBN\\RnD\\FS_Programs\\Fitting Applications\\HearSuite\\20{args[1]}\\Pre-releases");
                         try
                         {
                             tmp.Savebuildsinfo("Philips_dir.txt", "Philips_path.txt", tmp2[0]);// zapis do pliku
@@ -343,6 +352,7 @@ namespace Rekurencjon
                         }
                         catch (Exception x)
                         {
+                            logging.AddLog("Full : " + x.ToString());
                             Console.WriteLine(x.ToString());
                         }
                        
@@ -354,6 +364,7 @@ namespace Rekurencjon
                         }
                         catch (Exception x)
                         {
+                            logging.AddLog("Full : " + x.ToString());
                             Console.WriteLine(x.ToString());
                         }
                         
@@ -369,7 +380,7 @@ namespace Rekurencjon
                         tmp2 = tmp.GetListOfFullPaths($"\\\\demant.com\\data\\KBN\\RnD\\FS_Programs\\Fitting Applications\\Oasis\\20{args[1]}\\Released");
                         tmp.Savebuildsinfo("Oasis_dir.txt", "Oasis_path.txt",  tmp2[0]);// zapis do plikuv
 
-                        tmp2 = tmp.GetListOfFullPaths($"\\\\demant.com\\data\\KBN\\RnD\\FS_Programs\\Fitting Applications\\Philips\\20{args[1]}\\Released");
+                        tmp2 = tmp.GetListOfFullPaths($"\\\\demant.com\\data\\KBN\\RnD\\FS_Programs\\Fitting Applications\\HearSuite\\20{args[1]}\\Released");
                         tmp.Savebuildsinfo("Philips_dir.txt", "Philips_path.txt",  tmp2[0]);// zapis do pliku
 
                         tmp2 = tmp.GetListOfFullPaths($"\\\\demant.com\\data\\KBN\\RnD\\FS_Programs\\Fitting Applications\\ExpressFit\\20{args[1]}\\Released");
@@ -391,32 +402,35 @@ namespace Rekurencjon
 
                     try
                     {
-                        if (args.Length == 4 )
+                        logging.AddLog("args.Length : " + args.Length.ToString());
+
+                        for (int i = 0; i < args.Length; i++)
                         {
-                            File.Copy(args[1], args[2]+ " " +args[3]);
+                            logging.AddLog($"args[{i}] : " + args[i].ToString());
+                        }
+
+                        if (args.Length == 4)
+                        {
+                            File.Copy(args[1], args[2] + " " + args[3]);                         
                         }
                         else
-                        File.Copy(args[1], args[2]);
+                        {
+                            File.Copy(args[1], args[2]);
+                        }
+                        
                     }
                     catch (Exception x)
                     {
+                        logging.AddLog(x.ToString());
                         Console.WriteLine(x.ToString());
                         Console.ReadKey();
 
                     }
-
-
-
                     break;
 
                 default:
                     break;
             }
-
-
-
-
-
 
             // tmp.Savebuildsinfo($"Oticon_path_Composition.txt", $"Oticon_dir_Composition.txt", tmp2[0]);
             return;
