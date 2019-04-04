@@ -12,7 +12,6 @@ namespace Rekurencjon
         public Log( string name)
         {
             CreateNewLog(name);
-
         }
 
         public FileStream LogFile;
@@ -26,17 +25,11 @@ namespace Rekurencjon
             pathToFile = $"C:\\Program Files\\UltimateChanger\\Logs\\Log_{name}_{DateTime.Now.ToString("yyyy-MM-dd_hh-mm-ss")}.txt";
             LogFile = File.Create(pathToFile);
             LogFile.Close();
-
-
         }
-
-
 
         public void AddLog(string log)
         {
             File.AppendAllText(pathToFile, DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss") + "\t" + log + Environment.NewLine);
         }
-
-
     }
 }

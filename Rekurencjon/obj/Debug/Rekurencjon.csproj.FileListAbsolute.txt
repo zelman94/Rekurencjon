@@ -19,3 +19,10 @@ C:\Users\paze\Documents\GitHub\Rekurencjon\Rekurencjon\obj\Debug\Rekurencjon.csp
 C:\Users\paze\Documents\GitHub\Rekurencjon\Rekurencjon\obj\Debug\Rekurencjon.exe
 C:\Users\paze\Documents\GitHub\Rekurencjon\Rekurencjon\obj\Debug\Rekurencjon.pdb
 C:\Users\paze\Documents\GitHub\Rekurencjon\Rekurencjon\obj\Debug\Rekurencjon.csprojAssemblyReference.cache
+C:\Projects\Rekurencjon\Rekurencjon\bin\Debug\Rekurencjon.exe.config
+C:\Projects\Rekurencjon\Rekurencjon\bin\Debug\Rekurencjon.exe
+C:\Projects\Rekurencjon\Rekurencjon\bin\Debug\Rekurencjon.pdb
+C:\Projects\Rekurencjon\Rekurencjon\obj\Debug\Rekurencjon.csprojAssemblyReference.cache
+C:\Projects\Rekurencjon\Rekurencjon\obj\Debug\Rekurencjon.csproj.CoreCompileInputs.cache
+C:\Projects\Rekurencjon\Rekurencjon\obj\Debug\Rekurencjon.exe
+C:\Projects\Rekurencjon\Rekurencjon\obj\Debug\Rekurencjon.pdb
