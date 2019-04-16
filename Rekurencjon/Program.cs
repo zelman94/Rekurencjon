@@ -1,18 +1,22 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Runtime.Remoting.Messaging;
+using System.Security.Policy;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Rekurencjon
 {
     internal class Program
     {
-        private const string ULTIMATE_CHANGER_PATH = @"C:\Program Files\UltimateChanger\";
-        private const string ULTIMATE_CHANGER_DATA_PATH = @"C:\Program Files\UltimateChanger\Data\";
-        private const string COMPOSITION_PATH = @"\\demant.com\data\KBN\RnD\SWS\Build\Arizona\Phoenix\Nightly-";
+        private const string GENERAL_PATH = @"\\demant.com\data\KBN\RnD\SWS\Build\Arizona\Phoenix";
+        private const string PATH_TO_RELEASED_FSW = @"\\demant.com\data\KBN\RnD\FS_Programs\Fitting Applications\";
 
         [DllImport("kernel32.dll")]
         static extern IntPtr GetConsoleWindow();
@@ -22,53 +26,7 @@ namespace Rekurencjon
 
         const int SW_HIDE = 0;
 
-        private static List<PathAndDir> GetListOfNightlyPaths(string rootPath, string release, string find) // pobieram liste paths do exe // find - MASTER albo RC
-        {
-            var listOfNightlyPaths_Master = new List<string>();
-            var listAllPathsAndDir = new List<PathAndDir>();
-            var directories = new List<string>();
-            try
-            {
-               directories = Directory.GetDirectories(rootPath + release).ToList();
-            }
-            catch (Exception x)
-            {
-                Console.WriteLine(x.ToString() + " \nat: " + rootPath + release);
-                Console.ReadKey();
-            }
-
-            var findString = find == "RC" ? "-rc-" : "Nightly-master";
-
-            foreach (var item in directories)
-            {
-                if (item.Contains(findString))
-                {
-                    listOfNightlyPaths_Master.Add(item);
-                }
-            }
-            var tmp = new PathAndDir();
-
-            foreach (var item in listOfNightlyPaths_Master)
-            {
-                if (!Directory.Exists(item + "\\DevResults-" + release)) continue;
-                tmp.path.Add(item);
-                tmp.dir.Add(new DirectoryInfo(item).Name + " " + Directory.GetCreationTime(item));
-            }
-
-            tmp.path.Reverse();
-            tmp.dir.Reverse();
-
-            // TODO why 50 ???
-            var tmp2 = tmp.path.Take(50);
-            var tmp3 = tmp.dir.Take(50);
-
-            listAllPathsAndDir.Add(new PathAndDir { path = tmp2.ToList(), dir = tmp3.ToList() });
-
-            return listAllPathsAndDir;
-        }
-
-
-        private static List<PathAndDir> GetListOfFullPaths(string rootPath) // pobieram liste paths do exe
+        private static PathsAndDirs GetListOfFullPaths(string rootPath)
         {
             var IPs_paths = new List<string>();
             var directoriesFull = new List<string>();
@@ -77,9 +35,14 @@ namespace Rekurencjon
             {
                 if (Directory.Exists(rootPath))
                 {
-                    IPs_paths = Directory.GetDirectories(rootPath).ToList(); // tu zawarte sa paths do IPs
+                    IPs_paths = Directory.GetDirectories(rootPath).ToList();
 
-                    //directories = Directory.GetDirectories(RootPath,"setup.exe",SearchOption.AllDirectories).ToList();
+                    foreach (var psPath in IPs_paths)
+                    {
+                        var paths = Directory.GetDirectories(psPath).ToList();
+                        Console.WriteLine(psPath);
+                    }
+
                     directoriesFull = Directory.GetFiles(rootPath, "setup.exe", SearchOption.AllDirectories).ToList();
                     var EXEs = Directory.GetFiles(rootPath, "*.exe", SearchOption.AllDirectories).ToList();
                     directoriesMedium = EXEs.FindAll(s => s.Contains("Medium"));
@@ -96,178 +59,222 @@ namespace Rekurencjon
             }
             directoriesFull.AddRange(directoriesMedium);
 
-            return new List<PathAndDir>(){ new PathAndDir { path = IPs_paths, dir = directoriesFull } };
+            return new PathsAndDirs { Paths = IPs_paths, Dirs = directoriesFull };
         }
 
-        public static void SaveBuildsInfo(string pathFile, string dirFile, PathAndDir dirsAndPaths) // pathFile - name file to save DIRS // dirFile - name file to save Paths, // disAndPaths - object contain list path and dirs to save
+        public static void SaveBuildsToDatabase(IEnumerable<Build> builds)
+        {
+            var db = new DatabaseManagerDataContext();
+            db.Builds.InsertAllOnSubmit(builds);
+            db.SubmitChanges();
+        }
+
+        public static IEnumerable<string> GetAllPreReleasedInstallers()
+        {
+            var dirs = Directory.GetDirectories(GENERAL_PATH);
+            return dirs.Where(i => i.Contains("\\FullInstaller") && IsBuildNew(i));
+        }
+
+        public static bool IsOlderThan14Days(DateTime date)
+        {
+            if (date.AddDays(14).CompareTo(DateTime.Now.Date) < 0)
+                return true;
+            return false;
+        }
+
+        public static bool IsBuildNew(string pathToCheck)
+        {
+            var directoryInfo = new DirectoryInfo(pathToCheck);
+            var dateOfLastModify = directoryInfo.LastWriteTime.Date;
+
+            return !IsOlderThan14Days(dateOfLastModify);
+        }
+
+        public static IEnumerable<string> GetFullBuildsPaths()
+        {
+            return GetAllPreReleasedInstallers().SelectMany(Directory.GetDirectories)
+                .Where(i => (i.Contains("rc") || i.Contains("master") || i.Contains("IP")) && IsBuildNew(i));
+        }
+
+        public static async Task<IEnumerable<string>> GetSetupPathsAsync(string buildPath)
+        {
+            return await Task.Run(() => Directory.GetFiles(buildPath, "setup.exe", SearchOption.AllDirectories));
+        }
+
+        public static bool TryGetAboutInfo(string buildPath, out string aboutInfo)
+        {
+            var charsToTrim = new[] {'-', '_'};
+            var match = Regex.Match(buildPath, @"_\d*\.?\d*\.?\d*\.?\d*\-");
+            aboutInfo = match.Value.TrimStart(charsToTrim).TrimEnd(charsToTrim);
+            return match.Success;
+        }
+
+        public static IEnumerable<string> GetAboutInfosFromDatabase()
+        {
+            var db = new DatabaseManagerDataContext();
+            return db.Builds.Select(b => b.About);
+        }
+
+        public static string GetBrand(string path)
+        {
+            var brands = new List<string>() {"Genie", "GenieMedical", "HearSuite", "Oasis", "ExpressFit"};
+            foreach (var brand in brands)
+            {
+                if (path.Contains(brand))
+                    return brand;
+            }
+
+            return "";
+        }
+
+        public static string GetOem(string path)
+        {
+            var parts = path.Split('\\');
+            return parts[parts.Length - 2];
+        }
+
+        public static string GetType(string path)
+        {
+            if (path.Contains("Nightly"))
+            {
+                return "NIGHTLY";
+            }
+            return "FULL";
+        }
+
+        public static bool TryGetRelease(string path, out string release)
+        {
+            var charsToTrim = new[] { '-', '_' };
+            var match = Regex.Match(path, @"-\d{2}.\d{1}-");
+            release = match.Value.TrimStart(charsToTrim).TrimEnd(charsToTrim);
+            return match.Success;
+        }
+
+        public static bool TryGetMode(string path, out string mode)
+        {
+            var charsToTrim = new[] { '-', '_' };
+            var match = Regex.Match(path, @"(rc|master|IP\d*)");
+            mode = match.Value.TrimStart(charsToTrim).TrimEnd(charsToTrim);
+            return match.Success;
+        }
+
+        public static bool TryCreateBuild(string path, out Build newBuild)
+        {
+            newBuild = null;
+            if (TryGetAboutInfo(path, out var aboutInfo)
+                 && TryGetRelease(path, out var release)
+                 && TryGetMode(path, out var mode))
+            {
+                newBuild = new Build()
+                {
+                    Type = GetType(path),
+                    Release = release,
+                    Mode = mode,
+                    About = aboutInfo,
+                    Brand = GetBrand(path),
+                    Oem = GetOem(path),
+                    Path = path,
+                    CreationDate = Directory.GetCreationTime(path).Date
+                };
+                return true;
+            }
+
+            return false;
+        }
+
+        public static bool ExistInDatabase(string buildPath)
+        {
+            var buildsInDatabase = GetAboutInfosFromDatabase();
+            if (TryGetAboutInfo(buildPath, out var aboutInfo))
+            {
+                if (!buildsInDatabase.Any(i => i.Contains(aboutInfo)))
+                    return false;
+            }
+
+            return true;
+        }
+
+        public static IEnumerable<Build> GetAllBuilds(IEnumerable<string> buildPaths)
+        {
+            var counter = 0;
+            var builds = new List<Build>();
+            foreach (var path in buildPaths)
+            {
+                if (TryCreateBuild(path, out var build))
+                {
+                    builds.Add(build);
+                    counter++;
+                }
+            }
+
+            Console.WriteLine("NUmber of builds: " + counter);
+            return builds;
+        }
+
+        public static async Task<IEnumerable<string>> GetAllPathsAsync()
+        {
+            var buildPaths = GetFullBuildsPaths();
+
+            return (await Task.WhenAll(buildPaths.Select(async path =>
+            {
+                var setupPaths = Enumerable.Empty<string>();
+                if (!ExistInDatabase(path))
+                    setupPaths = await GetSetupPathsAsync(path);
+                return setupPaths;
+            }))).SelectMany(path => path);
+        }
+
+        public static void DeleteOldPaths()
+        {
+            Console.WriteLine("INFO: Deleting old builds: ");
+
+            var db = new DatabaseManagerDataContext();
+            var buildsToDelete = db.Builds.ToList().Where(build => IsOlderThan14Days(build.CreationDate ?? DateTime.Now.Date));
+
+            db.Builds.DeleteAllOnSubmit(buildsToDelete);
+            db.SubmitChanges();
+
+            Console.WriteLine($"{buildsToDelete.Count()} deleted");
+        }
+
+        public static void DeleteNotExistingBuild()
+        {
+            Console.WriteLine("INFO: Deleting not existing builds: ");
+
+            var db = new DatabaseManagerDataContext();
+            var buildsToDelete = db.Builds.Where(b => !File.Exists(b.Path));
+            db.SubmitChanges();
+
+            Console.Write($"{buildsToDelete.Count()} deleted");
+        }
+
+        public static async Task Main()
         {
             try
             {
-                if (!Directory.Exists(ULTIMATE_CHANGER_DATA_PATH))
-                {
-                    if (!Directory.Exists(ULTIMATE_CHANGER_PATH))
-                    {
-                        Directory.CreateDirectory(ULTIMATE_CHANGER_PATH);
-                        Directory.CreateDirectory(ULTIMATE_CHANGER_DATA_PATH);
-                    }
-                    else
-                    {
-                        Directory.CreateDirectory(ULTIMATE_CHANGER_DATA_PATH);
-                    }
-                }
-                if (dirsAndPaths != null)
-                {
-                    using (var outputFile = new StreamWriter(ULTIMATE_CHANGER_DATA_PATH + dirFile))
-                    {
-                        foreach (var line in dirsAndPaths.dir)
-                            outputFile.WriteLine(line);
+                DeleteOldPaths();
+                DeleteNotExistingBuild();
+                var stopwatch = Stopwatch.StartNew();
 
-                        outputFile.Close();
-                    }
+                Console.WriteLine("Start application");
+                var paths = await GetAllPathsAsync();
+                Console.WriteLine("Get builds");
+                var builds = GetAllBuilds(paths);
+                Console.WriteLine("Save to database");
 
-                    using (var outputFile = new StreamWriter(ULTIMATE_CHANGER_DATA_PATH + pathFile))
-                    {
+                SaveBuildsToDatabase(builds);
 
-                        foreach (var line in dirsAndPaths.path)
-                            outputFile.WriteLine(line);
-
-                        outputFile.Close();
-                    }
-                }
-                else
-                {
-                    using (var outputFile = new StreamWriter(ULTIMATE_CHANGER_DATA_PATH + dirFile))
-                    {
-                        outputFile.WriteLine("");
-                        outputFile.Close();
-                    }
-
-                    using (var outputFile = new StreamWriter(ULTIMATE_CHANGER_DATA_PATH + pathFile))
-                    {
-                        outputFile.WriteLine("");
-                        outputFile.Close();
-                    }
-                }
+                stopwatch.Stop();
+                Console.WriteLine("Finished in: " + stopwatch.Elapsed);
+                Console.ReadKey();
             }
-            catch (Exception x)
+            catch (Exception e)
             {
-                //  MessageBox.Show("cannot write to file");
+                Console.WriteLine(e);
+                Console.ReadKey();
             }
-        }
-        
-        private static void GetPathsOfFull(string name, string release, string version, Log logging)
-        {
-            var pathToFull = $"\\\\demant.com\\data\\KBN\\RnD\\FS_Programs\\Fitting Applications\\{name}\\20{release}\\{version}";
-            var paths = GetListOfFullPaths(pathToFull);
-            try
-            {
-                SaveBuildsInfo($"{name}_dir.txt", $"{name}_path.txt", paths[0]);
-            }
-            catch (Exception x)
-            {
-                logging.AddLog("Full : " + x.ToString());
-                Console.WriteLine(x.ToString());
-            }
-        }
+   
 
-        private static void Main(string[] args)
-        {
-            var logging = new Log("Rekurencjon");
-
-            var buildType = args[0];    // Full/Medium/Composition/Copy
-            var release = args[1];      // release
-            var pathFile = args[2];     // pathFile - only file name
-            var dirFile = args[3];      // dirFile - only file name "test.txt" // full path
-            var branch = args[4];       // RC/MASTER
-
-            var handle = GetConsoleWindow();
-            ShowWindow(handle, SW_HIDE);  // Hide
-
-            logging.AddLog("Start as : " + buildType);
-
-
-            switch(buildType)
-            {
-                case "Composition":
-                    List<PathAndDir> tmp2;
-                    try
-                    {
-                        if (Directory.Exists(COMPOSITION_PATH + release))
-                        {
-                            tmp2 = GetListOfNightlyPaths(COMPOSITION_PATH, release, branch);
-                        }
-                        else
-                            break;
-                    }
-                    catch (Exception)
-                    {
-                        tmp2 = GetListOfNightlyPaths(COMPOSITION_PATH, "19.1", "");
-                    }
-
-                    SaveBuildsInfo(pathFile, dirFile, tmp2[0]);
-                    Console.WriteLine((args[2]));
-                    Console.WriteLine((args[3]));
-                    break;
-
-                case "Full":
-                   
-                    // 2 ściezki do release and pre-release
-                    // config, baza na ściezki
-                    if (Directory.Exists($"\\\\demant.com\\data\\KBN\\RnD\\FS_Programs\\Fitting Applications\\Genie\\20{release}\\Released"))
-                    {
-                        GetPathsOfFull("Genie", release, "Released", logging);
-                        GetPathsOfFull("GenieMedical", release, "Released", logging);
-                        GetPathsOfFull("Oasis", release, "Released", logging);
-                        GetPathsOfFull("HearSuite", release, "Released", logging);
-                        GetPathsOfFull("ExpressFit", release, "Released", logging);
-                    }
-                    else
-                    {
-                        GetPathsOfFull("Genie", release, "Pre-releases", logging);
-                        GetPathsOfFull("GenieMedical", release, "Pre-releases", logging);
-                        GetPathsOfFull("Oasis", release, "Pre-releases", logging);
-                        GetPathsOfFull("HearSuite", release, "Pre-releases", logging);
-                        GetPathsOfFull("ExpressFit", release, "Pre-releases", logging);
-                    }
-                    break;
-
-                // TODO copy?? what does it do? is it used?
-                case "Copy":
-                    //Copy:
-                    // args 1 from
-                    // args 2 to
-                    // args 3 name of file
-
-                    // args 0 Copy
-                    // args 1 from
-                    // args 2 to
-                    try
-                    {
-                        logging.AddLog("args.Length : " + args.Length.ToString());
-
-                        for (int i = 0; i < args.Length; i++)
-                        {
-                            logging.AddLog($"args[{i}] : " + args[i].ToString());
-                        }
-
-                        if (args.Length == 4)
-                        {
-                            File.Copy(release, pathFile + " " + dirFile);                         
-                        }
-                        else
-                        {
-                            File.Copy(release, pathFile);
-                        }
-                    }
-                    catch (Exception x)
-                    {
-                        logging.AddLog(x.ToString());
-                        Console.WriteLine(x.ToString());
-                        Console.ReadKey();
-                    }
-                    break;
-            }
-            // tmp.Savebuildsinfo($"Oticon_path_Composition.txt", $"Oticon_dir_Composition.txt", tmp2[0]);
         }
     }
 }

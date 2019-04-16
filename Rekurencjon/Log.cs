@@ -14,15 +14,17 @@ namespace Rekurencjon
             CreateNewLog(name);
         }
 
+        public const string LOG_PATH = @"..\Logs\";
+
         public FileStream LogFile;
         public string pathToFile;
         public void CreateNewLog(string name)
         {
-            if (!Directory.Exists("C:\\Program Files\\UltimateChanger\\Logs"))
+            if (!Directory.Exists(LOG_PATH))
             {
-                Directory.CreateDirectory("C:\\Program Files\\UltimateChanger\\Logs");
+                Directory.CreateDirectory(LOG_PATH);
             }
-            pathToFile = $"C:\\Program Files\\UltimateChanger\\Logs\\Log_{name}_{DateTime.Now.ToString("yyyy-MM-dd_hh-mm-ss")}.txt";
+            pathToFile = LOG_PATH + $"Log_{name}_{DateTime.Now.ToString("yyyy-MM-dd_hh-mm-ss")}.txt";
             LogFile = File.Create(pathToFile);
             LogFile.Close();
         }

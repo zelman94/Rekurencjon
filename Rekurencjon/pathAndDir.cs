@@ -6,14 +6,15 @@ using System.Threading.Tasks;
 
 namespace Rekurencjon
 {
-    public class PathAndDir
+    public class PathsAndDirs
     {
-        public List<string> path;
-        public List<string> dir;
-        public PathAndDir()
+        public List<string> Paths { get; set; }
+        public List<string> Dirs { get; set; }
+
+        public PathsAndDirs()
         {
-            path = new List<string>();
-            dir = new List<string>();
+            Paths = new List<string>();
+            Dirs = new List<string>();
         }
     }
 }
