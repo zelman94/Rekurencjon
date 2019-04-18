@@ -94,9 +94,11 @@ namespace Rekurencjon
 		
 		private string _Oem;
 		
-		private string _Path;
-		
 		private System.Nullable<System.DateTime> _CreationDate;
+		
+		private string _BuildID;
+		
+		private string _Path;
 		
     #region Extensibility Method Definitions
     partial void OnLoaded();
@@ -116,10 +118,12 @@ namespace Rekurencjon
     partial void OnBrandChanged();
     partial void OnOemChanging(string value);
     partial void OnOemChanged();
-    partial void OnPathChanging(string value);
-    partial void OnPathChanged();
     partial void OnCreationDateChanging(System.Nullable<System.DateTime> value);
     partial void OnCreationDateChanged();
+    partial void OnBuildIDChanging(string value);
+    partial void OnBuildIDChanged();
+    partial void OnPathChanging(string value);
+    partial void OnPathChanged();
     #endregion
 		
 		public Build()
@@ -147,7 +151,7 @@ namespace Rekurencjon
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Type", DbType="NChar(10) NOT NULL", CanBeNull=false)]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Type", DbType="NChar(20) NOT NULL", CanBeNull=false)]
 		public string Type
 		{
 			get
@@ -167,7 +171,7 @@ namespace Rekurencjon
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Release", DbType="NChar(10) NOT NULL", CanBeNull=false)]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Release", DbType="NChar(20) NOT NULL", CanBeNull=false)]
 		public string Release
 		{
 			get
@@ -187,7 +191,7 @@ namespace Rekurencjon
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Mode", DbType="NChar(10) NOT NULL", CanBeNull=false)]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Mode", DbType="NChar(20) NOT NULL", CanBeNull=false)]
 		public string Mode
 		{
 			get
@@ -207,7 +211,7 @@ namespace Rekurencjon
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_About", DbType="NChar(10) NOT NULL", CanBeNull=false)]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_About", DbType="NChar(20) NOT NULL", CanBeNull=false)]
 		public string About
 		{
 			get
@@ -267,26 +271,6 @@ namespace Rekurencjon
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Path", DbType="Text NOT NULL", CanBeNull=false, UpdateCheck=UpdateCheck.Never)]
-		public string Path
-		{
-			get
-			{
-				return this._Path;
-			}
-			set
-			{
-				if ((this._Path != value))
-				{
-					this.OnPathChanging(value);
-					this.SendPropertyChanging();
-					this._Path = value;
-					this.SendPropertyChanged("Path");
-					this.OnPathChanged();
-				}
-			}
-		}
-		
 		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CreationDate", DbType="Date")]
 		public System.Nullable<System.DateTime> CreationDate
 		{
@@ -303,6 +287,46 @@ namespace Rekurencjon
 					this._CreationDate = value;
 					this.SendPropertyChanged("CreationDate");
 					this.OnCreationDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_BuildID", DbType="Text NOT NULL", CanBeNull=false, UpdateCheck=UpdateCheck.Never)]
+		public string BuildID
+		{
+			get
+			{
+				return this._BuildID;
+			}
+			set
+			{
+				if ((this._BuildID != value))
+				{
+					this.OnBuildIDChanging(value);
+					this.SendPropertyChanging();
+					this._BuildID = value;
+					this.SendPropertyChanged("BuildID");
+					this.OnBuildIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Path", DbType="Text NOT NULL", CanBeNull=false, UpdateCheck=UpdateCheck.Never)]
+		public string Path
+		{
+			get
+			{
+				return this._Path;
+			}
+			set
+			{
+				if ((this._Path != value))
+				{
+					this.OnPathChanging(value);
+					this.SendPropertyChanging();
+					this._Path = value;
+					this.SendPropertyChanged("Path");
+					this.OnPathChanged();
 				}
 			}
 		}
