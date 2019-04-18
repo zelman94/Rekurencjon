@@ -74,7 +74,7 @@ namespace Rekurencjon
                 var setupPaths = Enumerable.Empty<string>();
                 try
                 {
-                    if (!Program.ExistInDatabase(path))
+                    if (! await Program.ExistInDatabase(path))
                         setupPaths = await GetInstallers(path);
                 }
                 catch (Exception e)

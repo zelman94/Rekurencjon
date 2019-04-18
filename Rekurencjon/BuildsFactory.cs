@@ -14,12 +14,13 @@ namespace Rekurencjon
         private static readonly log4net.ILog Logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
 
-        public IEnumerable<Build> GetAllBuilds(IEnumerable<string> buildPaths)
+        public async Task<IEnumerable<Build>> GetAllBuilds(IEnumerable<string> buildPaths)
         {
             var builds = new List<Build>();
             foreach (var path in buildPaths)
             {
-                if (TryCreateBuild(path, out var build))
+                var (success, build) = await TryCreateBuild(path);
+                if (success)
                 {
                     builds.Add(build);
                 }
@@ -30,18 +31,21 @@ namespace Rekurencjon
             return builds;
         }
 
-        private bool TryCreateBuild(string path, out Build newBuild)
+        private async Task<(bool Success, Build Build)> TryCreateBuild(string path)
         {
-            newBuild = null;
-            if (TryGetAboutInfo(path, out var aboutInfo)
-                && TryGetRelease(path, out var release)
-                && TryGetMode(path, out var mode)
-                && TryGetBuildID(path, out var buildID)
-                && GetType(path, out var type)
+            var (infoSuccess, aboutInfo) = await TryGetAboutInfo(path);
+            var (releaseSuccess, release) = await TryGetRelease(path);
+            var (modeSuccess, mode) = await TryGetMode(path);
+            var (buildIdSuccess, buildID) = await TryGetBuildID(path);
+            var (typeSuccess, type) = await GetType(path);
+            var (oemSuccess, oem) = await GetOem(path);
+
+            if (infoSuccess && releaseSuccess && modeSuccess
+                && buildIdSuccess&& typeSuccess
                 && GetBrand(path, out var brand)
-                && GetOem(path, out var oem))
+                && oemSuccess)
             {
-                newBuild = new Build()
+                var newBuild = new Build()
                 {
                     Type = type,
                     Release = release,
@@ -54,11 +58,12 @@ namespace Rekurencjon
                     Path = path
                 };
 
-                return true;
+                return (true, newBuild);
             }
-            //Logger.Warn($"Unable to create build: {path}");
 
-            return false;
+            Logger.Warn($"Unable to create build: {path}");
+
+            return (false, null);
         }
 
         private static string CreateJSONPath(string path)
@@ -75,7 +80,7 @@ namespace Rekurencjon
             return buildInfoJson;
         }
 
-        private bool TryGetAboutForMedium(string path, out string aboutInfo)
+        private async Task<(bool Success, string AboutInfo)> TryGetAboutForMedium(string path)
         {
             var buildInfoJSON = CreateJSONPath(path);
 
@@ -87,43 +92,44 @@ namespace Rekurencjon
                     {
                         var line = reader.ReadLine();
                         if (line.Contains("Version"))
-                            return TryGetAboutInfo(line, out aboutInfo);
+                            return await TryGetAboutInfo(line);
                     }
                 }
             }
 
             Logger.Warn($"Unable to get about for: {path}");
-            aboutInfo = "";
-            return false;
+            var aboutInfo = "";
+            return (false, aboutInfo);
         }
 
-        private bool TryGetAboutInfo(string path, out string aboutInfo)
+        private async Task<(bool Success, string AboutInfo)> TryGetAboutInfo(string path)
         {
             var charsToTrim = new[] { '-', '_', '.', '\\' };
-            var match = Regex.Match(path, @"\d*\.\d*\.\d*\.?\d*(-|\\|\-|\.|)");
-            aboutInfo = match.Value.TrimStart(charsToTrim).TrimEnd(charsToTrim);
+            var match = await Task.Run(() => Regex.Match(path, @"\d*\.\d*\.\d*\.?\d*(-|\\|\-|\.|)"));
+
+            var aboutInfo = match.Value.TrimStart(charsToTrim).TrimEnd(charsToTrim);
 
             if (path.Contains("Medium") && !match.Success)
             {
-                return TryGetAboutForMedium(path, out aboutInfo);
+                return await TryGetAboutForMedium(path);
             }
 
             if (!match.Success)
                 Logger.Warn($"Unable to get about for: {path}");
 
-            return match.Success;
+            return (match.Success, aboutInfo);
         }
 
-        public static bool TryGetBuildID(string path, out string buildID)
+        public static async Task<(bool Success, string BuildID)> TryGetBuildID(string path)
         {
             var charsToTrim = new[] { '-', '_' };
-            var match = Regex.Match(path, @"(((Full|Night|Fitting)(.*?)\\(.*)(\\))|((Full|Night|Fitting)(.*?)\\(.*)))");
-            buildID = match.Value.TrimStart(charsToTrim).TrimEnd(charsToTrim);
+            var match = await Task.Run(() => Regex.Match(path, @"(((Full|Night|Fitting)(.*?)\\(.*)(\\))|((Full|Night|Fitting)(.*?)\\(.*)))"));
+            var buildID = match.Value.TrimStart(charsToTrim).TrimEnd(charsToTrim);
 
             if (!match.Success)
                 Logger.Warn($"Unable to get buildID for: {path}");
 
-            return match.Success;
+            return (match.Success, buildID);
         }
 
         private bool GetBrand(string path, out string brandOut)
@@ -143,26 +149,26 @@ namespace Rekurencjon
             return false;
         }
 
-        private bool GetOem(string path, out string oem)
+        private async Task<(bool Success, string orm)> GetOem(string path)
         {
             if (path.Contains("DevResults"))
-                return GetBrand(path, out oem);
+                return (GetBrand(path, out var brand), brand);
 
             var charsToTrim = new[] { '-', '_', '\\' };
-            var match = Regex.Match(path, @"(((?<=Medium)([^\d]*)(?=\.exe))|((?<=\\)([^\d]*)(?=setup)))");
-            oem = match.Value.TrimStart(charsToTrim).TrimEnd(charsToTrim);
+            var match = await Task.Run(() => Regex.Match(path, @"(((?<=Medium)([^\d]*)(?=\.exe))|((?<=\\)([^\d]*)(?=setup)))"));
+            var oem = match.Value.TrimStart(charsToTrim).TrimEnd(charsToTrim);
 
             if (!match.Success)
                 Logger.Warn($"Unable to get oem for: {path}");
 
-            return match.Success;
+            return (match.Success, oem);
         }
 
-        private bool GetType(string path, out string type)
+        private async Task<(bool Success, string Type)> GetType(string path)
         {
             var charsToTrim = new[] { '-', '_' };
-            var match = Regex.Match(path, @"(Medium|Full|Dev|Released)");
-            type = match.Value.TrimStart(charsToTrim).TrimEnd(charsToTrim);
+            var match = await Task.Run(() => Regex.Match(path, @"(Medium|Full|Dev|Released)"));
+            var type = match.Value.TrimStart(charsToTrim).TrimEnd(charsToTrim);
 
             if (type.Equals("Dev"))
                 type = "Composition";
@@ -173,31 +179,31 @@ namespace Rekurencjon
             if (!match.Success)
                 Logger.Warn($"Unable to get release for: {path}");
 
-            return match.Success;
+            return (match.Success, type);
         }
 
-        private bool TryGetRelease(string path, out string release)
+        private async Task<(bool Success, string Release)> TryGetRelease(string path)
         {
             var charsToTrim = new[] { '-', '_' };
-            var match = Regex.Match(path, @"-\d{2}\.\d{1}");
-            release = match.Value.TrimStart(charsToTrim).TrimEnd(charsToTrim);
+            var match = await Task.Run(() => Regex.Match(path, @"-\d{2}\.\d{1}"));
+            var release = match.Value.TrimStart(charsToTrim).TrimEnd(charsToTrim);
 
             if (!match.Success)
                 Logger.Warn($"Unable to get release for: {path}");
 
-            return match.Success;
+            return (match.Success, release);
         }
 
-        private bool TryGetMode(string path, out string mode)
+        private async Task<(bool Success, string Mode)> TryGetMode(string path)
         {
             var charsToTrim = new[] { '-', '_' };
-            var match = Regex.Match(path, @"(rc|master|Released|IP\d*)");
-            mode = match.Value.TrimStart(charsToTrim).TrimEnd(charsToTrim);
+            var match = await Task.Run(() => Regex.Match(path, @"(rc|master|Released|IP\d*)"));
+            var mode = match.Value.TrimStart(charsToTrim).TrimEnd(charsToTrim);
 
             if (!match.Success)
                 Logger.Warn($"Unable to get mode for: {path}");
 
-            return match.Success;
+            return (match.Success, mode);
         }
     }
 }

@@ -65,15 +65,16 @@ namespace Rekurencjon
         public static IEnumerable<string> GetBuildIDFromDatabase()
         {
             var db = new DatabaseManagerDataContext();
-            return db.Builds.Select(b => b.BuildID);
+            return db.Builds.Select(b => b.BuildID).ToList();
         }
 
-        public static bool ExistInDatabase(string buildPath)
+        public static async Task<bool> ExistInDatabase(string buildPath)
         {
-            var buildsInDatabase = GetBuildIDFromDatabase();
-            if (BuildsFactory.TryGetBuildID(buildPath, out var buildID))
+            var (success, buildId) = await BuildsFactory.TryGetBuildID(buildPath);
+
+            if (success)
             {
-                if (!buildsInDatabase.Any(i => i.Contains(buildID)))
+                if (!DatabaseBuildIDs.Any(i => i.Contains(buildId)))
                 {
                     return false;
                 }
@@ -83,6 +84,7 @@ namespace Rekurencjon
         }
 
         private static readonly log4net.ILog Logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        public static IEnumerable<string> DatabaseBuildIDs { get; set; }
 
         public static async Task Main()
         {
@@ -93,6 +95,8 @@ namespace Rekurencjon
                 var performanceTimer = Stopwatch.StartNew();
                 Logger.Info("Started performance timer");
 
+                DatabaseBuildIDs = GetBuildIDFromDatabase();
+
                 DeleteOldPaths();
                 DeleteNotExistingBuild();
 
@@ -100,7 +104,7 @@ namespace Rekurencjon
                 var paths = await pathFinder.GetAllPathsAsync();
 
                 var factory = new BuildsFactory();
-                var builds = factory.GetAllBuilds(paths);
+                var builds = await factory.GetAllBuilds(paths);
 
                 SaveBuildsToDatabase(builds);
 
