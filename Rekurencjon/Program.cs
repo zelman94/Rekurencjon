@@ -45,7 +45,15 @@ namespace Rekurencjon
         public static void DeleteOldPaths()
         {
             var db = new DatabaseManagerDataContext();
-            var buildsToDelete = db.Builds.ToList().Where(build => IsOlderThan(build.CreationDate ?? DateTime.Now.Date, 14));
+            var buildsToDelete = db.Builds.ToList().Where(build =>
+            {
+                var days = 7;
+                if (build.Type.Equals("Full", StringComparison.InvariantCultureIgnoreCase))
+                    days = 14;
+
+                return IsOlderThan(build.CreationDate ?? DateTime.Now.Date, days);
+
+            });
 
             db.Builds.DeleteAllOnSubmit(buildsToDelete);
             db.SubmitChanges();
