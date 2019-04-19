@@ -1,0 +1,6 @@
+2019-04-19 14:17:41,825 INFO [1] [C:\Projects\Rekurencjon\Rekurencjon\Program.cs] MoveNext() line:120: Starting Rekurencjon
+2019-04-19 14:17:41,855 INFO [1] [C:\Projects\Rekurencjon\Rekurencjon\Program.cs] DeleteOldLogs() line:109: deleted 0 old logs
+2019-04-19 14:17:41,856 INFO [1] [C:\Projects\Rekurencjon\Rekurencjon\Program.cs] MoveNext() line:125: Started performance timer
+2019-04-19 14:17:42,458 INFO [1] [C:\Projects\Rekurencjon\Rekurencjon\Program.cs] DeleteOldPaths() line:63: deleted 0 builds
+2019-04-19 14:17:42,615 INFO [1] [C:\Projects\Rekurencjon\Rekurencjon\Program.cs] DeleteNotExistingBuild() line:72: deleted 0 builds
+2019-04-19 14:17:42,619 INFO [1] [C:\Projects\Rekurencjon\Rekurencjon\PathFinder.cs] MoveNext() line:68: Started getting path, it will take a while...

@@ -21,3 +21,4 @@ C:\Projects\Rekurencjon\Rekurencjon\obj\Release\Rekurencjon.csproj.CoreCompileIn
 C:\Projects\Rekurencjon\Rekurencjon\obj\Release\Rekurencjon.csproj.CopyComplete
 C:\Projects\Rekurencjon\Rekurencjon\obj\Release\Rekurencjon.exe
 C:\Projects\Rekurencjon\Rekurencjon\obj\Release\Rekurencjon.pdb
+C:\Projects\Rekurencjon\Rekurencjon\obj\Release\Rekurencjon.csprojAssemblyReference.cache

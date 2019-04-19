@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Microsoft.Azure.Documents.SystemFunctions;
 using Newtonsoft.Json;
 
 namespace Rekurencjon
@@ -16,19 +17,16 @@ namespace Rekurencjon
 
         public async Task<IEnumerable<Build>> GetAllBuilds(IEnumerable<string> buildPaths)
         {
-            var builds = new List<Build>();
-            foreach (var path in buildPaths)
+            var builds = (await Task.WhenAll(buildPaths.Select(async path =>
             {
                 var (success, build) = await TryCreateBuild(path);
-                if (success)
-                {
-                    builds.Add(build);
-                }
-            }
+                return success ? build : null;
+            }))).Where(b => b != null);
 
-            Logger.Info($"Number of builds: {builds.Count}");
+            var buildList = builds.ToList();
+            Logger.Info($"Number of builds: {buildList.Count}");
 
-            return builds;
+            return buildList;
         }
 
         private async Task<(bool Success, Build Build)> TryCreateBuild(string path)

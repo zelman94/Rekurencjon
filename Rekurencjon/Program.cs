@@ -35,11 +35,13 @@ namespace Rekurencjon
 
         public static void SaveBuildsToDatabase(IEnumerable<Build> builds)
         {
+            var buildList = builds.ToList();
+
             var db = new DatabaseManagerDataContext();
-            db.Builds.InsertAllOnSubmit(builds);
+            db.Builds.InsertAllOnSubmit(buildList);
             db.SubmitChanges();
 
-            Logger.Info($"Saved {builds.ToList().Count} new builds to database");
+            Logger.Info($"Saved {buildList.Count} new builds to database");
         }
 
         public static void DeleteOldPaths()
@@ -55,10 +57,11 @@ namespace Rekurencjon
 
             });
 
-            db.Builds.DeleteAllOnSubmit(buildsToDelete);
+            var toDelete = buildsToDelete.ToList();
+            db.Builds.DeleteAllOnSubmit(toDelete);
             db.SubmitChanges();
 
-            Logger.Info($"deleted {buildsToDelete.Count()} builds");
+            Logger.Info($"deleted {toDelete.Count()} builds");
         }
 
         public static void DeleteNotExistingBuild()
