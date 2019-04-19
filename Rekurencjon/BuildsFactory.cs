@@ -104,32 +104,27 @@ namespace Rekurencjon
 
         private async Task<(bool Success, string AboutInfo)> TryGetAboutInfo(string path)
         {
-            var charsToTrim = new[] { '-', '_', '.', '\\' };
-            var match = await Task.Run(() => Regex.Match(path, @"\d*\.\d*\.\d*\.?\d*(-|\\|\-|\.|)"));
+            var (success, aboutInfo) = await RunRegex(path, @"\d*\.\d*\.\d*\.?\d*(-|\\|\-|\.|)");
 
-            var aboutInfo = match.Value.TrimStart(charsToTrim).TrimEnd(charsToTrim);
-
-            if (path.Contains("Medium") && !match.Success)
+            if (path.Contains("Medium") && !success)
             {
                 return await TryGetAboutForMedium(path);
             }
 
-            if (!match.Success)
+            if (!success)
                 Logger.Warn($"Unable to get about for: {path}");
 
-            return (match.Success, aboutInfo);
+            return (success, aboutInfo);
         }
 
         public static async Task<(bool Success, string BuildID)> TryGetBuildID(string path)
         {
-            var charsToTrim = new[] { '-', '_' };
-            var match = await Task.Run(() => Regex.Match(path, @"(((Full|Night|Fitting)(.*?)\\(.*)(\\))|((Full|Night|Fitting)(.*?)\\(.*)))"));
-            var buildID = match.Value.TrimStart(charsToTrim).TrimEnd(charsToTrim);
+            var (success, buildID) = await RunRegex(path, @"(((Full|Night|Fitting)(.*?)\\(.*)(\\))|((Full|Night|Fitting)(.*?)\\(.*)))");
 
-            if (!match.Success)
+            if (!success)
                 Logger.Warn($"Unable to get buildID for: {path}");
 
-            return (match.Success, buildID);
+            return (success, buildID);
         }
 
         private bool GetBrand(string path, out string brandOut)
@@ -154,21 +149,17 @@ namespace Rekurencjon
             if (path.Contains("DevResults"))
                 return (GetBrand(path, out var brand), brand);
 
-            var charsToTrim = new[] { '-', '_', '\\' };
-            var match = await Task.Run(() => Regex.Match(path, @"(((?<=Medium)([^\d]*)(?=\.exe))|((?<=\\)([^\d]*)(?=setup)))"));
-            var oem = match.Value.TrimStart(charsToTrim).TrimEnd(charsToTrim);
+            var (success, oem) = await RunRegex(path, @"(((?<=Medium)([^\d]*)(?=\.exe))|((?<=\\)([^\d]*)(?=setup)))");
 
-            if (!match.Success)
+            if (!success)
                 Logger.Warn($"Unable to get oem for: {path}");
 
-            return (match.Success, oem);
+            return (success, oem);
         }
 
         private async Task<(bool Success, string Type)> GetType(string path)
         {
-            var charsToTrim = new[] { '-', '_' };
-            var match = await Task.Run(() => Regex.Match(path, @"(Medium|Full|Dev|Released)"));
-            var type = match.Value.TrimStart(charsToTrim).TrimEnd(charsToTrim);
+            var (success, type) = await RunRegex(path, @"(Medium|Full|Dev|Released)");
 
             if (type.Equals("Dev"))
                 type = "Composition";
@@ -176,34 +167,36 @@ namespace Rekurencjon
             if (type.Equals("Released"))
                 type = "Full";
 
-            if (!match.Success)
+            if (!success)
                 Logger.Warn($"Unable to get release for: {path}");
 
-            return (match.Success, type);
+            return (success, type);
         }
 
         private async Task<(bool Success, string Release)> TryGetRelease(string path)
         {
-            var charsToTrim = new[] { '-', '_' };
-            var match = await Task.Run(() => Regex.Match(path, @"-\d{2}\.\d{1}"));
-            var release = match.Value.TrimStart(charsToTrim).TrimEnd(charsToTrim);
-
-            if (!match.Success)
+            var (success, release) = await RunRegex(path, @"-\d{2}\.\d{1}");
+            if (!success)
                 Logger.Warn($"Unable to get release for: {path}");
 
-            return (match.Success, release);
+            return (success, release);
         }
 
         private async Task<(bool Success, string Mode)> TryGetMode(string path)
         {
-            var charsToTrim = new[] { '-', '_' };
-            var match = await Task.Run(() => Regex.Match(path, @"(rc|master|Released|IP\d*)"));
-            var mode = match.Value.TrimStart(charsToTrim).TrimEnd(charsToTrim);
-
-            if (!match.Success)
+            var (success, mode) = await RunRegex(path, @"(rc|master|Released|IP\d*)");
+            if (!success)
                 Logger.Warn($"Unable to get mode for: {path}");
 
-            return (match.Success, mode);
+            return (success, mode);
+        }
+
+        private static async Task<(bool Success, string Value)> RunRegex(string text, string regex)
+        {
+            var charsToTrim = new[] { '-', '_', '.', '\\' };
+            var match = await Task.Run(() => Regex.Match(text, regex));
+            var value = match.Value.TrimStart(charsToTrim).TrimEnd(charsToTrim);
+            return (match.Success, value);
         }
     }
 }

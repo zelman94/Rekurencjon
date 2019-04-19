@@ -91,6 +91,23 @@ namespace Rekurencjon
             return true;
         }
 
+        public static void DeleteOldLogs()
+        {
+            var logs = Directory.GetFiles(@"..\logs\");
+
+            var numOfDeletedLogs = 0;
+            foreach (var log in logs)
+            {
+                if (IsOlderThan(Directory.GetCreationTime(log).Date, 2))
+                {
+                    numOfDeletedLogs++;
+                    File.Delete(log);
+                }
+            }
+            Logger.Info($"deleted {numOfDeletedLogs} old logs");
+
+        }
+
         private static readonly log4net.ILog Logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         public static IEnumerable<string> DatabaseBuildIDs { get; set; }
 
@@ -99,6 +116,8 @@ namespace Rekurencjon
             try
             {
                 Logger.Info("Starting Rekurencjon");
+
+                DeleteOldLogs();
 
                 var performanceTimer = Stopwatch.StartNew();
                 Logger.Info("Started performance timer");

@@ -14,17 +14,16 @@ namespace Rekurencjon
 
         private static readonly log4net.ILog Logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        private bool PathIsNightly(string path)
-        {
-            return path.Contains("\\Nightly");
-        }
+        private bool IsNightly(string path) => path.Contains("\\Nightly");
+
+        private bool IsFull(string path) => path.Contains("\\FullInstaller");
 
         private bool IsBuildNew(string pathToCheck)
         {
             var directoryInfo = new DirectoryInfo(pathToCheck);
             var dateOfLastModify = directoryInfo.LastWriteTime.Date;
 
-            if (PathIsNightly(pathToCheck))
+            if (IsNightly(pathToCheck))
                 return !Program.IsOlderThan(dateOfLastModify, 7);
 
             return !Program.IsOlderThan(dateOfLastModify, 14);
@@ -53,14 +52,15 @@ namespace Rekurencjon
         private IEnumerable<string> GetFullBuildsPaths()
         {
             return GetAllPreReleasedInstallers().SelectMany(Directory.GetDirectories)
-                .Where(i => (i.Contains("rc") || i.Contains("master") || i.Contains("IP")) && IsBuildNew(i));
+                .Where(i => (i.Contains("rc") || i.Contains("master") || i.Contains("IP"))
+                            && IsBuildNew(i));
         }
 
         private IEnumerable<string> GetAllPreReleasedInstallers()
         {
             var dirs = Directory.GetDirectories(GENERAL_PATH);
-            return dirs.Where(i => ( i.Contains("\\FullInstaller") || PathIsNightly(i) )
-                                   && IsBuildNew(i));
+            return dirs.Where(i => (IsFull(i) || IsNightly(i))
+                                    && IsBuildNew(i));
         }
 
         public async Task<IEnumerable<string>> GetAllPathsAsync()

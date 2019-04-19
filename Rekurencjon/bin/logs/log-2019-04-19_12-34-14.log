@@ -1,0 +1,3 @@
+2019-04-19 12:34:14,422 INFO [1] [C:\Projects\Rekurencjon\Rekurencjon\Program.cs] MoveNext() line:114: Starting Rekurencjon
+2019-04-19 12:34:14,458 INFO [1] [C:\Projects\Rekurencjon\Rekurencjon\Program.cs] DeleteOldLogs() line:103: deleted 4 old logs
+2019-04-19 12:34:14,460 INFO [1] [C:\Projects\Rekurencjon\Rekurencjon\Program.cs] MoveNext() line:119: Started performance timer

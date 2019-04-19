@@ -1,0 +1,4 @@
+2019-04-19 12:35:53,206 INFO [1] [C:\Projects\Rekurencjon\Rekurencjon\Program.cs] MoveNext() line:118: Starting Rekurencjon
+2019-04-19 12:35:53,239 INFO [1] [C:\Projects\Rekurencjon\Rekurencjon\Program.cs] DeleteOldLogs() line:107: deleted 0 old logs
+2019-04-19 12:35:53,241 INFO [1] [C:\Projects\Rekurencjon\Rekurencjon\Program.cs] MoveNext() line:123: Started performance timer
+2019-04-19 12:36:17,799 INFO [1] [C:\Projects\Rekurencjon\Rekurencjon\Program.cs] DeleteOldPaths() line:61: deleted 513 builds
