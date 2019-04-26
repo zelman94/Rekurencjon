@@ -53,8 +53,8 @@ namespace Rekurencjon
                 if (build.Type.Equals("Full", StringComparison.InvariantCultureIgnoreCase))
                     days = 14;
 
-                return IsOlderThan(build.CreationDate ?? DateTime.Now.Date, days);
-
+                return IsOlderThan(build.CreationDate ?? DateTime.Now.Date, days)
+                       && !build.Mode.Equals("IP", StringComparison.CurrentCultureIgnoreCase);
             });
 
             var toDelete = buildsToDelete.ToList();
