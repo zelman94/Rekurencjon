@@ -38,7 +38,8 @@ namespace Rekurencjon
 
         private async Task<IEnumerable<string>> GetExePathsAsync(string buildPath)
         {
-            return await Task.Run(() => Directory.GetFiles(buildPath, "*.exe", SearchOption.AllDirectories));
+            return await Task.Run(() => Directory.GetFiles(buildPath, "*.exe", SearchOption.AllDirectories).
+                Where(path => !path.Contains("EmulatorProgram") && !path.Contains("ScriptingTool")));
         }
 
         private async Task<IEnumerable<string>> GetInstallers(string buildPath)

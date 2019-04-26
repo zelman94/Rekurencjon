@@ -1,4 +1,0 @@
-2019-04-26 12:19:18,059 INFO [1] [C:\Projects\Rekurencjon\Rekurencjon\Program.cs] MoveNext() line:121: Starting Rekurencjon
-2019-04-26 12:19:18,091 INFO [1] [C:\Projects\Rekurencjon\Rekurencjon\Program.cs] DeleteOldLogs() line:110: deleted 0 old logs
-2019-04-26 12:19:18,093 INFO [1] [C:\Projects\Rekurencjon\Rekurencjon\Program.cs] MoveNext() line:126: Started performance timer
-2019-04-26 12:19:18,098 INFO [1] [C:\Projects\Rekurencjon\Rekurencjon\PathFinder.cs] MoveNext() line:79: Started getting path, it will take a while...

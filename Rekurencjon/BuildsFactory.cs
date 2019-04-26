@@ -68,14 +68,17 @@ namespace Rekurencjon
         {
             var parts = path.Split('\\');
 
-            var buildInfoJson = parts[0];
+            var pathToBuildInfo = parts[0];
             for (var i = 1; i < parts.Length - 2; i++)
             {
-                buildInfoJson += "\\" + parts[i];
+                pathToBuildInfo += "\\" + parts[i];
             }
 
-            buildInfoJson += @"\Doc\BuildInfo.json";
-            return buildInfoJson;
+            var buildInfoJson = @"\BuildInfo.json";
+            if (!File.Exists(pathToBuildInfo + buildInfoJson))
+                pathToBuildInfo += @"\DOC";
+
+            return pathToBuildInfo + buildInfoJson;
         }
 
         private async Task<(bool Success, string AboutInfo)> TryGetAboutForMedium(string path)
@@ -127,7 +130,7 @@ namespace Rekurencjon
 
         private bool GetBrand(string path, out string brandOut)
         {
-            var brands = new List<string>() { "Genie", "GenieMedical", "HearSuite", "Oasis", "ExpressFit" };
+            var brands = new List<string>() { "Genie", "GenieMedical", "HearSuite", "Oasis", "ExpressFit", "Cumulus" };
             foreach (var brand in brands)
             {
                 if (path.IndexOf(brand, StringComparison.InvariantCultureIgnoreCase) >= 0)

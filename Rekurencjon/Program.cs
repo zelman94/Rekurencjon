@@ -50,11 +50,11 @@ namespace Rekurencjon
             var buildsToDelete = db.Builds.ToList().Where(build =>
             {
                 var days = 7;
-                if (build.Type.Equals("Full", StringComparison.InvariantCultureIgnoreCase))
+                if (build.Type.Trim().Equals("Full", StringComparison.InvariantCultureIgnoreCase))
                     days = 14;
 
                 return IsOlderThan(build.CreationDate ?? DateTime.Now.Date, days)
-                       && !build.Mode.Equals("IP", StringComparison.CurrentCultureIgnoreCase);
+                       && !build.Mode.Trim().Equals( "IP");
             });
 
             var toDelete = buildsToDelete.ToList();
