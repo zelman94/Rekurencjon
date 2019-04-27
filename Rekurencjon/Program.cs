@@ -54,7 +54,7 @@ namespace Rekurencjon
                     days = 14;
 
                 return IsOlderThan(build.CreationDate ?? DateTime.Now.Date, days)
-                       && !build.Mode.Trim().Equals( "IP");
+                       && !build.Mode.Trim().Contains( "IP");
             });
 
             var toDelete = buildsToDelete.ToList();
