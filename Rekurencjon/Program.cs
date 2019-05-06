@@ -54,7 +54,8 @@ namespace Rekurencjon
                     days = 14;
 
                 return IsOlderThan(build.CreationDate ?? DateTime.Now.Date, days)
-                       && !build.Mode.Trim().Contains( "IP");
+                       && !build.Mode.Contains( "IP")
+                       && !build.Mode.Contains("Released");
             });
 
             var toDelete = buildsToDelete.ToList();
@@ -136,7 +137,7 @@ namespace Rekurencjon
                 var factory = new BuildsFactory();
                 var builds = await factory.GetAllBuilds(paths);
 
-                SaveBuildsToDatabase(builds);
+                //SaveBuildsToDatabase(builds);
 
                 performanceTimer.Stop();
                 Logger.Info("Stop timer");

@@ -112,6 +112,11 @@ namespace Rekurencjon
                 return await TryGetAboutForMedium(path);
             }
 
+            if (!success && PathFinder.IsReleased(path))
+            {
+                return (true, "Full");
+            }
+
             if (!success)
                 Logger.Warn($"Unable to get about for: {path}");
 
@@ -130,7 +135,7 @@ namespace Rekurencjon
 
         private bool GetBrand(string path, out string brandOut)
         {
-            var brands = new List<string>() { "Genie", "GenieMedical", "HearSuite", "Oasis", "ExpressFit", "Cumulus" };
+            var brands = new List<string>() { "GenieMedical", "Genie", "HearSuite", "Oasis", "ExpressFit", "Cumulus" };
             foreach (var brand in brands)
             {
                 if (path.IndexOf(brand, StringComparison.InvariantCultureIgnoreCase) >= 0)
@@ -150,7 +155,10 @@ namespace Rekurencjon
             if (path.Contains("DevResults"))
                 return (GetBrand(path, out var brand), brand);
 
-            var (success, oem) = await RunRegex(path, @"(((?<=Medium)([^\d]*)(?=\.exe))|((?<=\\)([^\d]*)(?=setup)))");
+            var (success, oem) = await RunRegex(path, @"(((?<=Medium)([^\d]*)(?=\.exe))|((?<=\\)([^\d]*)(?=setup))|((?<=Full)([^\d]*)(?=Setup)))");
+
+            if (oem.Trim().Equals("Oticonmedical", StringComparison.InvariantCultureIgnoreCase))
+                oem = "GenieMedical";
 
             if (!success)
                 Logger.Warn($"Unable to get oem for: {path}");
@@ -176,7 +184,7 @@ namespace Rekurencjon
 
         private async Task<(bool Success, string Release)> TryGetRelease(string path)
         {
-            var (success, release) = await RunRegex(path, @"-\d{2}\.\d{1}");
+            var (success, release) = await RunRegex(path, @"((-\d{2}\.\d{1})|(\\\d{4}\.\d{1}\\))");
             if (!success)
                 Logger.Warn($"Unable to get release for: {path}");
 

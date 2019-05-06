@@ -18,7 +18,7 @@ namespace Rekurencjon
 
         private bool IsFull(string path) => path.Contains("\\FullInstaller");
 
-        private bool IsReleased(string path) => path.Contains("\\Released");
+        public static bool IsReleased(string path) => path.Contains("\\Released");
 
         private bool IsBuildNew(string pathToCheck)
         {
@@ -54,18 +54,36 @@ namespace Rekurencjon
 
         private IEnumerable<string> GetAllBuildsPaths()
         {
-            var preReleases = GetAllPreReleasedVersions().SelectMany(Directory.GetDirectories)
-                                  .Where(i => ((i.Contains("rc") || i.Contains("master")) && IsBuildNew(i)) ||
-                              i.Contains("IP"));
+            //var preReleases = GetAllPreReleasedVersions().SelectMany(Directory.GetDirectories)
+            //                      .Where(i => ((i.Contains("rc") || i.Contains("master")) && IsBuildNew(i)) ||
+            //                  i.Contains("IP"));
 
-            //var preReleases = GetAllReleasedVersions();
+            var preReleases = GetAllReleasedVersions();
             return preReleases;
         }
 
         private IEnumerable<string> GetAllReleasedVersions()
         {
-            var dirs = Directory.GetDirectories(RELEASED_PATH, "Released", SearchOption.AllDirectories);
-            return dirs;
+            return RecursiveSearch(RELEASED_PATH);
+        }
+
+        private IEnumerable<string> RecursiveSearch(string directory, int depthLevel = 0)
+        {
+            depthLevel++;
+            var subDirs =  Directory.GetDirectories(directory);
+            var ret = new List<string>();
+            foreach (var path in subDirs)
+            {
+                if (path.Contains("Released"))
+                {
+                    ret.Add(path);
+                }
+                else if (!path.Contains("Pre-release") && depthLevel < 3)
+                {
+                    ret.AddRange(RecursiveSearch(path, depthLevel));
+                }
+            }
+            return ret;
         }
 
         private IEnumerable<string> GetAllPreReleasedVersions()
