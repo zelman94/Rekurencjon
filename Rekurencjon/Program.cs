@@ -119,6 +119,12 @@ namespace Rekurencjon
         {
             try
             {
+                var handle = GetConsoleWindow();
+
+                //// Hide
+                ShowWindow(handle, SW_HIDE);
+                Program tmp = new Program();
+
                 Logger.Info("Starting Rekurencjon");
 
                 DeleteOldLogs();
