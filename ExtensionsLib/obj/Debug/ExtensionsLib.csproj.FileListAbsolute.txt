@@ -1,0 +1,6 @@
+C:\Projects\Rekurencjon\ExtensionsLib\obj\Debug\ExtensionsLib.csprojAssemblyReference.cache
+C:\Projects\Rekurencjon\ExtensionsLib\obj\Debug\ExtensionsLib.csproj.CoreCompileInputs.cache
+C:\Projects\Rekurencjon\ExtensionsLib\bin\Debug\ExtensionsLib.dll
+C:\Projects\Rekurencjon\ExtensionsLib\bin\Debug\ExtensionsLib.pdb
+C:\Projects\Rekurencjon\ExtensionsLib\obj\Debug\ExtensionsLib.dll
+C:\Projects\Rekurencjon\ExtensionsLib\obj\Debug\ExtensionsLib.pdb

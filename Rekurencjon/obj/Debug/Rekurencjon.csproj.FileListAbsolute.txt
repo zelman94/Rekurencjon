@@ -44,3 +44,5 @@ C:\Projects\Rekurencjon\Rekurencjon\obj\Debug\Rekurencjon.csprojAssemblyReferenc
 C:\Projects\Rekurencjon\Rekurencjon\bin\Debug\log4net.dll
 C:\Projects\Rekurencjon\Rekurencjon\bin\Debug\log4net.xml
 C:\Projects\Rekurencjon\Rekurencjon\obj\Debug\Rekurencjon.exe.config
+C:\Projects\Rekurencjon\Rekurencjon\bin\Debug\ExtensionsLib.dll
+C:\Projects\Rekurencjon\Rekurencjon\bin\Debug\ExtensionsLib.pdb
