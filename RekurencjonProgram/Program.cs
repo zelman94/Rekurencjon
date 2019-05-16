@@ -63,6 +63,7 @@ namespace Rekurencjon
                 var performanceTimer = Stopwatch.StartNew();
                 Logger.Info("Started performance timer");
 
+                DatabaseManagerDataContext databaseMng = new DatabaseManagerDataContext();
                 databaseMng.GetBuildIDFromDatabase();
 
                 databaseMng.DeleteOldPaths();

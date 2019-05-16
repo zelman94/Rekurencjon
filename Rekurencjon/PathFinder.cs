@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Rekurencjon
@@ -12,12 +12,18 @@ namespace Rekurencjon
         private const string PRE_RELEASES_PATH = @"\\demant.com\data\KBN\RnD\SWS\Build\Arizona\Phoenix";
         private const string RELEASED_PATH = @"\\demant.com\data\KBN\RnD\FS_Programs\Fitting Applications\";
 
+        private List<string> possibleModes = new List<string> { "RC", "MASTER" };
+        private List<string> possibleTypes = new List<string> { "\\Nightly", "\\FullInstaller", "\\Released" };
+
         private static readonly log4net.ILog Logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
+        [DebuggerStepThrough]
         private bool IsNightly(string path) => path.Contains("\\Nightly");
 
+        [DebuggerStepThrough]
         private bool IsFull(string path) => path.Contains("\\FullInstaller");
 
+        [DebuggerStepThrough]
         private bool IsReleased(string path) => path.Contains("\\Released");
 
         private bool IsBuildNew(string pathToCheck)
@@ -26,9 +32,9 @@ namespace Rekurencjon
             var dateOfLastModify = directoryInfo.LastWriteTime.Date;
 
             if (IsNightly(pathToCheck))
-                return !Program.IsOlderThan(dateOfLastModify, 7);
+                return !dateOfLastModify.IsOlderThan(7);
 
-            return !Program.IsOlderThan(dateOfLastModify, 14);
+            return dateOfLastModify.IsOlderThan(14);
         }
 
         private async Task<IEnumerable<string>> GetSetupPathsAsync(string buildPath)
@@ -54,9 +60,10 @@ namespace Rekurencjon
 
         private IEnumerable<string> GetAllBuildsPaths()
         {
-            var preReleases = GetAllPreReleasedVersions().SelectMany(Directory.GetDirectories)
-                                  .Where(i => ((i.Contains("rc") || i.Contains("master")) && IsBuildNew(i)) ||
-                              i.Contains("IP"));
+            var preReleases = GetAllPreReleasedVersions()
+                                  .SelectMany(Directory.GetDirectories)
+                                  .Where(path => (path.ContainsAny(possibleModes) && IsBuildNew(path)) ||
+                                                  path.Contains("IP"));
 
             //var preReleases = GetAllReleasedVersions();
             return preReleases;
