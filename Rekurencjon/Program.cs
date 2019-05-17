@@ -68,6 +68,8 @@ namespace Rekurencjon
         {
             var db = new DatabaseManagerDataContext();
             var buildsToDelete = db.Builds.ToList().Where(b => !File.Exists(b.Path));
+            var toDelete = buildsToDelete.ToList();
+            db.Builds.DeleteAllOnSubmit(toDelete);
             db.SubmitChanges();
 
             Logger.Info($"deleted {buildsToDelete.Count()} builds");
