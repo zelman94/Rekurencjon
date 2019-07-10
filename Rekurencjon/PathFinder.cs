@@ -55,6 +55,7 @@ namespace Rekurencjon
         private IEnumerable<string> GetAllBuildsPaths()
         {
             bool success = false;
+            int counter = 0;
             while(!success)
             {
                 try
@@ -63,10 +64,13 @@ namespace Rekurencjon
                                       .Where(i => ((i.Contains("rc") || i.Contains("master")) && IsBuildNew(i)) ||
                                   i.Contains("IP"));
                     success = true;
+                    counter++;
                 }    
                 catch(Exception e)
                 {
                     Logger.Warn(e);
+                    if (counter > 20)
+                        throw;
                 }
             }
             
