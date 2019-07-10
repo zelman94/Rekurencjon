@@ -54,9 +54,22 @@ namespace Rekurencjon
 
         private IEnumerable<string> GetAllBuildsPaths()
         {
-            var preReleases = GetAllPreReleasedVersions().SelectMany(Directory.GetDirectories)
-                                  .Where(i => ((i.Contains("rc") || i.Contains("master")) && IsBuildNew(i)) ||
-                              i.Contains("IP"));
+            bool success = false;
+            while(!success)
+            {
+                try
+                {
+                    var preReleases = GetAllPreReleasedVersions().SelectMany(Directory.GetDirectories)
+                                      .Where(i => ((i.Contains("rc") || i.Contains("master")) && IsBuildNew(i)) ||
+                                  i.Contains("IP"));
+                    success = true;
+                }    
+                catch(Exception e)
+                {
+                    Logger.Warn(e);
+                }
+            }
+            
 
             //var preReleases = GetAllReleasedVersions();
             return preReleases;
