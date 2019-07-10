@@ -54,13 +54,14 @@ namespace Rekurencjon
 
         private IEnumerable<string> GetAllBuildsPaths()
         {
+            var preReleases = Enumerable.Empty<string>();
             bool success = false;
             int counter = 0;
             while(!success)
             {
                 try
                 {
-                    var preReleases = GetAllPreReleasedVersions().SelectMany(Directory.GetDirectories)
+                    preReleases = GetAllPreReleasedVersions().SelectMany(Directory.GetDirectories)
                                       .Where(i => ((i.Contains("rc") || i.Contains("master")) && IsBuildNew(i)) ||
                                   i.Contains("IP"));
                     success = true;
