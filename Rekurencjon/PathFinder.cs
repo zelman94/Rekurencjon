@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Rekurencjon
@@ -61,20 +62,20 @@ namespace Rekurencjon
             {
                 try
                 {
+                    counter++;
                     preReleases = GetAllPreReleasedVersions().SelectMany(Directory.GetDirectories)
                                       .Where(i => ((i.Contains("rc") || i.Contains("master")) && IsBuildNew(i)) ||
                                   i.Contains("IP"));
                     success = true;
-                    counter++;
                 }    
                 catch(Exception e)
                 {
                     Logger.Warn(e);
-                    if (counter > 20)
+                    if (counter > 5)
                         throw;
+                    Thread.Sleep(2000);
                 }
             }
-            
 
             //var preReleases = GetAllReleasedVersions();
             return preReleases;
