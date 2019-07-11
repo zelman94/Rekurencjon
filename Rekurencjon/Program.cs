@@ -118,9 +118,14 @@ namespace Rekurencjon
 
         public static async Task Main()
         {
+            IntPtr handle = GetConsoleWindow();
             try
-            {
+            {               
                 Logger.Info("Starting Rekurencjon");
+
+                // Hide
+                ShowWindow(handle,SW_HIDE);
+
 
                 DeleteOldLogs();
 
@@ -147,6 +152,8 @@ namespace Rekurencjon
             catch (Exception e)
             {
                 Logger.Error(e);
+                ShowWindow(handle, 1);                
+                Console.ReadKey();
             }
 
             Console.ReadKey();
